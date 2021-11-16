@@ -1,0 +1,56 @@
+package ${AbstractDaoPackage};
+
+import java.sql.SQLException;
+import java.util.List;
+
+
+public interface CrudDao<Entity, Key>
+{
+
+    int countList(Entity filter) throws SQLException;
+    int countList(Entity filter, SqlOptions sqlOptions) throws SQLException;
+    int countFind(Entity filter) throws SQLException;
+    int countFind(Entity filter, SqlOptions sqlOptions) throws SQLException;
+    int countAll() throws SQLException;
+
+    boolean existsById(Key id) throws SQLException;
+    boolean exists(Entity filter) throws SQLException;
+    boolean exists(Entity filter, SqlOptions sqlOptions) throws SQLException;
+
+    Key getId(Entity filter) throws SQLException;
+    Key getId(Entity filter, SqlOptions sqlOptions) throws SQLException;
+    List<Key> getIds(Entity filter) throws SQLException;
+    List<Key> getIds(Entity filter, SqlOptions sqlOptions) throws SQLException;
+    List<Key> findIds(Entity filter) throws SQLException;
+    List<Key> findIds(Entity filter, SqlOptions sqlOptions) throws SQLException;
+    List<Key> getAllIds() throws SQLException;
+    List<Key> getAllIds(SqlOptions sqlOptions) throws SQLException;
+
+    Entity getById(Key id) throws SQLException;
+    Entity getById(Key id, SqlOptions sqlOptions) throws SQLException;
+    Entity get(Entity filter) throws SQLException;
+    Entity get(Entity filter, SqlOptions sqlOptions) throws SQLException;
+    //List<Entity> getInIds(Key... ids)  throws SQLException;
+    List<Entity> getList(Entity filter) throws SQLException;
+    List<Entity> getList(Entity filter, SqlOptions sqlOptions) throws SQLException;
+    List<Entity> findList(Entity filter) throws SQLException;
+    List<Entity> findList(Entity filter, SqlOptions sqlOptions) throws SQLException;
+    List<Entity> getAll() throws SQLException;
+    List<Entity> getAll(SqlOptions sqlOptions) throws SQLException;
+
+    void create(Entity entity) throws SQLException;
+
+    int updateById(Entity entity) throws SQLException;
+    int modifyById(Entity entity) throws SQLException;
+    int updateMany(Entity entity, Entity filter) throws SQLException;
+    int updateMany(Entity entity, Entity filter, SqlOptions sqlOptions) throws SQLException;
+    int modifyMany(Entity entity, Entity filter) throws SQLException;
+    int modifyMany(Entity entity, Entity filter, SqlOptions sqlOptions) throws SQLException;
+
+    int deleteById(Key id) throws SQLException;
+    //int deleteInIds(Long... ids) throws SQLException;
+    int deleteMany(Entity filter) throws SQLException;
+    int deleteMany(Entity filter, SqlOptions sqlOptions) throws SQLException;
+    int deleteAll() throws SQLException;
+
+}

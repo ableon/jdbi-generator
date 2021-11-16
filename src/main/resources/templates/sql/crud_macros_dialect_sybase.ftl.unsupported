@@ -1,0 +1,29 @@
+
+
+<#macro schema><#if schemaName??>${schemaName}.</#if></#macro>
+
+
+<#macro begin_paginate>
+    <#if options?? && options.limit??>
+        SELECT TOP ${options.limit}<#if options.offset??> START AT ${options.offset}</#if>
+    </#if>
+</#macro>
+
+
+<#macro end_paginate>
+
+</#macro>
+
+
+<#macro like value>LIKE ('%' + ${value} + '%')</#macro>
+
+
+<#macro dateGE dateColumn dateValue>
+            (DATEDIFF(day, ${dateColumn}, ${dateValue}) >= 0)
+</#macro>
+
+
+<#macro dateLE dateColumn dateValue>
+            (DATEDIFF(day, ${dateColumn}, ${dateValue}) >= 0)
+</#macro>
+

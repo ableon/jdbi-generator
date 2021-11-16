@@ -1,0 +1,7 @@
+package ${CrudDaoPackage};
+
+import ${AbstractDaoPackage}.CrudDao;
+import ${EntitiesPackage}.${Entity};
+
+public interface ${ClassName}CrudDao extends CrudDao<${Entity}, ${Key}>
+{}

@@ -1,0 +1,20 @@
+
+
+spring.hikari.datasource.${DataSourcePropertiesName}.driverClassName = ${driverClassName}
+spring.hikari.datasource.${DataSourcePropertiesName}.jdbcUrl = ${jdbcUrl}
+spring.hikari.datasource.${DataSourcePropertiesName}.username = ${username}
+spring.hikari.datasource.${DataSourcePropertiesName}.password = ${password}
+spring.hikari.datasource.${DataSourcePropertiesName}.poolName = Hikari-Pool-${ClassName}
+spring.hikari.datasource.${DataSourcePropertiesName}.connectionTimeout = 30000
+spring.hikari.datasource.${DataSourcePropertiesName}.autoCommit = false
+spring.hikari.datasource.${DataSourcePropertiesName}.readOnly = false
+spring.hikari.datasource.${DataSourcePropertiesName}.minimumIdle = 1
+spring.hikari.datasource.${DataSourcePropertiesName}.maximumPoolSize = 4
+spring.hikari.datasource.${DataSourcePropertiesName}.idleTimeout = 600000
+spring.hikari.datasource.${DataSourcePropertiesName}.maxLifetime = 1800000
+<#if properties??>
+<#list properties as key, value>
+spring.hikari.datasource.${DataSourcePropertiesName}.dataSourceProperties.${key} = ${value}
+</#list>
+</#if>
+

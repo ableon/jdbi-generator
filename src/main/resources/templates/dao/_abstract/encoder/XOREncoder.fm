@@ -1,0 +1,92 @@
+package ${EncoderDaoPackage};
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
+
+public class XOREncoder implements Encoder
+{
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
+
+    private final String key;
+
+
+    public XOREncoder()
+    {
+        this("abcdefghijklmnopqrstuvwxyz1234567890");
+    }
+
+
+    public XOREncoder(String key)
+    {
+        this.key = key;
+    }
+
+
+    private byte[] encrypt(byte[] data, byte[] key)
+    {
+        if (data == null || data.length == 0 || key == null || key.length == 0)
+        {
+            return data;
+        }
+
+        byte[] result = new byte[data.length];
+
+        // use key byte array to cycle encryption or decryption
+        for (int i=0; i<data.length; i++)
+        {
+            // data is XOR with key, and then XOR with low 8 bits of cyclic variable (increasing complexity)
+            result[i] = (byte) (data[i] ^ key[i % key.length] ^ (i & 0xFF));
+        }
+
+        return result;
+    }
+
+
+    @Override
+    public String encode(String plain)
+    {
+        try
+        {
+            byte[] xor = encrypt(plain.getBytes(CHARSET), key.getBytes(CHARSET));
+            return Base64.getUrlEncoder().withoutPadding().encodeToString( xor );
+        }
+        catch (Exception e)
+        {
+            return plain;
+        }
+    }
+
+
+    @Override
+    public String decode(String encoded)
+    {
+        try
+        {
+            byte[] b64 = Base64.getUrlDecoder().decode(encoded);
+            return new String(encrypt(b64, key.getBytes(CHARSET)), CHARSET);
+        }
+        catch (Exception e)
+        {
+            return encoded;
+        }
+    }
+
+
+    /*
+    public static void main(String[] args)
+    {
+        Encoder encoder = new XOREncoder();
+
+        String plain   = "test-1234";
+        String encoded = encoder.encode( plain );
+        String decoded = encoder.decode( encoded );
+
+        System.out.println("plain: " + plain);
+        System.out.println("encoded: " + encoded);
+        System.out.println("decoded: " + decoded);
+    }
+    */
+}
+

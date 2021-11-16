@@ -1,0 +1,1087 @@
+package ${AbstractDaoPackage};
+
+import java.sql.SQLException;
+import java.util.*;
+
+
+public abstract class AbstractCrudDao<Entity, Key, GeneratedKey> extends AbstractLogging implements CrudDao<Entity, Key>
+{
+    protected final Map<String, Object> EMPTY_MAP = new HashMap<>();
+
+
+    protected AbstractCrudDao()
+    {
+        super();
+    }
+
+
+    protected abstract JdbiCrudDao<Entity, Key, GeneratedKey> getJdbiCrudDao();
+    protected abstract void encode(Entity entity);
+    protected abstract void decode(Entity entity);
+    protected abstract String getQuoteId();
+    protected abstract String getTableName();
+    protected abstract List<String> getColumnsName();
+    protected abstract List<String> getKeyColumnsName();
+    protected abstract List<String> getGeneratedKeyColumnNames();
+    protected abstract Map<String, Object> getKeyColumnsMap(Key key, Map<String, Object> data);
+    protected abstract Map<String, Object> getEntityKeyColumnsMap(Entity key, Map<String, Object> data);
+    protected abstract Map<String, Object> getFilterColumnsMap(Entity filter, Map<String, Object> data);
+    protected abstract Map<String, Object> getEntityColumnsMap(Entity entity, boolean removeNulls, Map<String, Object> data);
+    protected abstract void setGeneratedKey(Entity entity, GeneratedKey generatedKey);
+
+
+    protected void encode(List<Entity> list)
+    {
+        if (list != null)
+            for (Entity entity : list)
+                encode( entity );
+    }
+
+    protected void decode(List<Entity> list)
+    {
+        if (list != null)
+            for (Entity entity : list)
+                decode( entity );
+    }
+
+
+    protected boolean isEmpty(Map<?, ?> map)
+    {
+        return (map == null || map.isEmpty());
+    }
+
+
+    protected boolean isEmpty(Collection<?> collection)
+    {
+        return (collection == null || collection.isEmpty());
+    }
+
+
+    protected boolean isValidIdentifier(String str, StringBuilder validIdentifier)
+    {
+        boolean valid = true;
+
+        String quoteId = getQuoteId();
+
+        if (str != null && str.startsWith(quoteId))
+        {
+            char[] chars = str.toCharArray();
+
+            for (char c : chars)
+            {
+                if (quoteId.equals(""+c))
+                    continue;
+
+                if (Character.isLetterOrDigit(c) || c == '_')
+                {
+                    validIdentifier.append(c);
+                }
+                else
+                {
+                    validIdentifier.append('_');
+                    valid = false;
+                }
+            }
+        }
+
+        return valid;
+    }
+
+
+    protected Map<String, Object> getOptions(SqlOptions sqlOptions)
+    {
+        return (sqlOptions != null) ? sqlOptions.toMap() : EMPTY_MAP;
+    }
+
+    protected Map<String, Object> getOptions(SqlOptions sqlOptions, int limitByDefault)
+    {
+        if (sqlOptions == null)
+            sqlOptions = SqlOptions.builder().build();
+
+        if (sqlOptions.getLimit() == null)
+            sqlOptions.setLimit( limitByDefault );
+
+        return getOptions( sqlOptions );
+    }
+
+
+    protected List<String> getSelectColumns(SqlOptions sqlOptions)
+    {
+        List<String> selectColumns = new ArrayList<>();
+
+        List<String> cols = (sqlOptions != null && sqlOptions.hasSelectColumns())
+                                ? sqlOptions.getSelectColumns()
+                                : getColumnsName();
+
+        StringBuilder validIdentifier = new StringBuilder();
+
+        for (String col : cols)
+        {
+            validIdentifier.delete(0, validIdentifier.length());
+
+            if (isValidIdentifier(col, validIdentifier))
+                selectColumns.add(col);
+            else
+                selectColumns.add(col + " AS " + validIdentifier);
+        }
+
+        return selectColumns;
+    }
+
+
+    protected void removeKeys(Map<String, Object> columnsMap, Map<String, Object> propertiesMap)
+    {
+        Collection<String> columns = getKeyColumnsName();
+
+        if (!isEmpty(columnsMap))
+            if (!isEmpty(columns))
+                for (String column : columns)
+                    if (columnsMap.get(column) != null)
+                        propertiesMap.remove( columnsMap.remove(column).toString() );
+    }
+
+
+    protected void removeGeneratedKeysWithNullValues(Map<String, Object> columnsMap, Map<String, Object> propertiesMap)
+    {
+        Collection<String> columns = getGeneratedKeyColumnNames();
+
+        if (!isEmpty(columnsMap))
+            if (!isEmpty(columns))
+                for (String column : columns)
+                    if (columnsMap.get(column) != null)
+                        if (propertiesMap.get(columnsMap.get(column).toString()) == null)
+                            propertiesMap.remove( columnsMap.remove(column).toString() );
+    }
+
+
+    protected boolean isInvalidKey(Map<String, Object> keyColumns)
+    {
+        // invalid key -> is empty or any is null
+        return (isEmpty(keyColumns) || keyColumns.values().stream().anyMatch(Objects::isNull));
+    }
+
+
+    protected boolean isInvalidFilter(Map<String, Object> filterColumns, SqlOptions sqlOptions)
+    {
+        // valid filter -> is not empty and any is not null
+        boolean validFilter = (!isEmpty(filterColumns) && filterColumns.values().stream().anyMatch(Objects::nonNull));
+
+        // valid filtering -> option has filtering
+        boolean validFiltering = (sqlOptions != null && sqlOptions.hasFiltering());
+
+        // invalid filter -> invalid filter columns and invalid option filtering
+        return (!validFilter && !validFiltering);
+    }
+
+
+
+    //
+    // Count
+    //
+
+    @Override
+    public int countList(Entity filter) throws SQLException
+    {
+        return countList(filter, null);
+    }
+
+    @Override
+    public int countList(Entity filter, SqlOptions sqlOptions) throws SQLException
+    {
+        super.debug("countList", filter, sqlOptions);
+
+        try
+        {
+            // filter
+            Map<String, Object> filterData = new LinkedHashMap<>();
+            Map<String, Object> filterColumns = getFilterColumnsMap(filter, filterData);
+
+            int count;
+
+            if (isInvalidFilter(filterColumns, sqlOptions))
+            {
+                // no filter --> count all
+                count = getJdbiCrudDao().countAll( getTableName() );
+            }
+            else
+            {
+                count = getJdbiCrudDao().countList(getTableName(), filterColumns, filterData, getOptions(sqlOptions));
+            }
+
+            debug("count", count);
+
+            return count;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    @Override
+    public int countFind(Entity filter) throws SQLException
+    {
+        return countFind(filter, null);
+    }
+
+    @Override
+    public int countFind(Entity filter, SqlOptions sqlOptions) throws SQLException
+    {
+        super.debug("countFind", filter, sqlOptions);
+
+        try
+        {
+            // filter
+            Map<String, Object> filterData = new LinkedHashMap<>();
+            Map<String, Object> filterColumns = getFilterColumnsMap(filter, filterData);
+
+            int count;
+
+            if (isInvalidFilter(filterColumns, sqlOptions))
+            {
+                // no filter --> count all
+                count = getJdbiCrudDao().countAll( getTableName() );
+            }
+            else
+            {
+                count = getJdbiCrudDao().countFind(getTableName(), filterColumns, filterData, getOptions(sqlOptions));
+            }
+
+            debug("count", count);
+
+            return count;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    @Override
+    public int countAll() throws SQLException
+    {
+        super.debug("countAll");
+
+        try
+        {
+            int count = getJdbiCrudDao().countAll( getTableName() );
+
+            debug("count", count);
+
+            return count;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    //
+    // Exists
+    //
+
+    @Override
+    public boolean existsById(Key id) throws SQLException
+    {
+        super.debug("existsById", id);
+
+        try
+        {
+            // key filter
+            Map<String, Object> keyData = new LinkedHashMap<>();
+            Map<String, Object> keyColumns = getKeyColumnsMap(id, keyData);
+
+            if (isInvalidKey(keyColumns))
+            {
+                debug("invalid Id --> count", 0);
+                return false;
+            }
+
+            int count = getJdbiCrudDao().countList(getTableName(), keyColumns, keyData, getOptions(null));
+
+            debug("count", count);
+
+            return (count > 0);
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    @Override
+    public boolean exists(Entity filter) throws SQLException
+    {
+        return exists(filter, null);
+    }
+
+    @Override
+    public boolean exists(Entity filter, SqlOptions sqlOptions) throws SQLException
+    {
+        super.debug("exists", filter, sqlOptions);
+
+        try
+        {
+            // filter
+            Map<String, Object> filterData = new LinkedHashMap<>();
+            Map<String, Object> filterColumns = getFilterColumnsMap(filter, filterData);
+
+            if (isInvalidFilter(filterColumns, sqlOptions))
+            {
+                debug("invalid filter --> count", 0);
+                return false;
+            }
+
+            int count = getJdbiCrudDao().countList(getTableName(), filterColumns, filterData, getOptions(sqlOptions));
+
+            debug("count", count);
+
+            return (count > 0);
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    //
+    // IDs
+    //
+
+    @Override
+    public Key getId(Entity filter) throws SQLException
+    {
+        return getId(filter, null);
+    }
+
+    @Override
+    public Key getId(Entity filter, SqlOptions sqlOptions) throws SQLException
+    {
+        super.debug("getId", filter, sqlOptions);
+
+        try
+        {
+            // filter
+            Map<String, Object> filterData = new LinkedHashMap<>();
+            Map<String, Object> filterColumns = getFilterColumnsMap(filter, filterData);
+
+            if (isInvalidFilter(filterColumns, sqlOptions))
+            {
+                debug("invalid filter --> rows", 0);
+                return null;
+            }
+
+            Key id = getJdbiCrudDao().getId(getTableName(),
+                                            getKeyColumnsName(),
+                                            filterColumns,
+                                            filterData,
+                                            getOptions(sqlOptions));
+
+            debug("rows", (id != null) ? 1 : 0);
+
+            return id;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    @Override
+    public List<Key> getIds(Entity filter) throws SQLException
+    {
+        return getIds(filter, null);
+    }
+
+    @Override
+    public List<Key> getIds(Entity filter, SqlOptions sqlOptions) throws SQLException
+    {
+        super.debug("getIds", filter, sqlOptions);
+
+        try
+        {
+            // filter
+            Map<String, Object> filterData = new LinkedHashMap<>();
+            Map<String, Object> filterColumns = getFilterColumnsMap(filter, filterData);
+
+            List<Key> ids;
+
+            if (isInvalidFilter(filterColumns, sqlOptions))
+            {
+                // no filter --> all Ids
+                ids = getJdbiCrudDao().getAllIds(getTableName(),
+                                                 getKeyColumnsName(),
+                                                 getKeyColumnsName(), // order by
+                                                 getOptions(sqlOptions, SqlOptions.MAX_LIMIT));
+            }
+            else
+            {
+                ids = getJdbiCrudDao().getIds(getTableName(),
+                                              getKeyColumnsName(),
+                                              filterColumns,
+                                              filterData,
+                                              getKeyColumnsName(), // order by
+                                              getOptions(sqlOptions, SqlOptions.MAX_LIMIT));
+            }
+
+            debug("rows", ids.size());
+
+            return ids;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    @Override
+    public List<Key> findIds(Entity filter) throws SQLException
+    {
+        return findIds(filter, null);
+    }
+
+    @Override
+    public List<Key> findIds(Entity filter, SqlOptions sqlOptions) throws SQLException
+    {
+        super.debug("findIds", filter, sqlOptions);
+
+        try
+        {
+            // filter
+            Map<String, Object> filterData = new LinkedHashMap<>();
+            Map<String, Object> filterColumns = getFilterColumnsMap(filter, filterData);
+
+            List<Key> ids;
+
+            if (isInvalidFilter(filterColumns, sqlOptions))
+            {
+                // no filter --> all Ids
+                ids = getJdbiCrudDao().getAllIds(getTableName(),
+                                                 getKeyColumnsName(),
+                                                 getKeyColumnsName(), // order by
+                                                 getOptions(sqlOptions, SqlOptions.MAX_LIMIT));
+            }
+            else
+            {
+                ids = getJdbiCrudDao().findIds(getTableName(),
+                                               getKeyColumnsName(),
+                                               filterColumns,
+                                               filterData,
+                                               getKeyColumnsName(), // order by
+                                               getOptions(sqlOptions, SqlOptions.MAX_LIMIT));
+            }
+
+            debug("rows", ids.size());
+
+            return ids;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    @Override
+    public List<Key> getAllIds() throws SQLException
+    {
+        return getAllIds( null );
+    }
+
+    @Override
+    public List<Key> getAllIds(SqlOptions sqlOptions) throws SQLException
+    {
+        super.debug("getAllIds", sqlOptions);
+
+        try
+        {
+            List<Key> ids = getJdbiCrudDao().getAllIds(getTableName(),
+                                                       getKeyColumnsName(),
+                                                       getKeyColumnsName(),
+                                                       getOptions(sqlOptions, SqlOptions.MAX_LIMIT));
+
+            debug("rows", ids.size());
+
+            return ids;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    //
+    // DTOs
+    //
+
+    @Override
+    public Entity getById(Key id) throws SQLException
+    {
+        return getById(id, null);
+    }
+
+    @Override
+    public Entity getById(Key id, SqlOptions sqlOptions) throws SQLException
+    {
+        super.debug("getById", id, sqlOptions);
+
+        try
+        {
+            // key filter
+            Map<String, Object> keyData = new LinkedHashMap<>();
+            Map<String, Object> keyColumns = getKeyColumnsMap(id, keyData );
+
+            if (isInvalidKey(keyColumns))
+            {
+                debug("invalid Id --> rows", 0);
+                return null;
+            }
+
+            Entity entity = getJdbiCrudDao().get(getTableName(),
+                                                 getSelectColumns(sqlOptions),
+                                                 keyColumns,
+                                                 keyData,
+                                                 getOptions(null));
+
+            decode( entity );
+
+            debug("rows", (entity != null) ? 1 : 0);
+
+            return entity;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    @Override
+    public Entity get(Entity filter) throws SQLException
+    {
+        return get(filter, null);
+    }
+
+    @Override
+    public Entity get(Entity filter, SqlOptions sqlOptions) throws SQLException
+    {
+        super.debug("get", filter, sqlOptions);
+
+        try
+        {
+            // filter
+            Map<String, Object> filterData = new LinkedHashMap<>();
+            Map<String, Object> filterColumns = getFilterColumnsMap(filter, filterData);
+
+            if (isInvalidFilter(filterColumns, sqlOptions))
+            {
+                debug("invalid filter --> rows", 0);
+                return null;
+            }
+
+            Entity entity = getJdbiCrudDao().get(getTableName(),
+                                                 getSelectColumns(sqlOptions),
+                                                 filterColumns,
+                                                 filterData,
+                                                 getOptions(sqlOptions));
+
+            decode( entity );
+
+            debug("rows", (entity != null) ? 1 : 0);
+
+            return entity;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    //List<ClientsDto> getInIds(Long... ids)  throws SQLException;
+
+
+    @Override
+    public List<Entity> getList(Entity filter) throws SQLException
+    {
+        return getList(filter, null);
+    }
+
+    @Override
+    public List<Entity> getList(Entity filter, SqlOptions sqlOptions) throws SQLException
+    {
+        super.debug("getList", filter, sqlOptions);
+
+        try
+        {
+            // filter
+            Map<String, Object> filterData = new LinkedHashMap<>();
+            Map<String, Object> filterColumns = getFilterColumnsMap(filter, filterData);
+
+            List<Entity> list;
+
+            if (isInvalidFilter(filterColumns, sqlOptions))
+            {
+                // no filter --> list all
+                list = getJdbiCrudDao().getAll(getTableName(),
+                                               getSelectColumns(sqlOptions),
+                                               getKeyColumnsName(), // order by
+                                               getOptions(sqlOptions, SqlOptions.MAX_LIMIT));
+            }
+            else
+            {
+                list = getJdbiCrudDao().getList(getTableName(),
+                                                getSelectColumns(sqlOptions),
+                                                filterColumns,
+                                                filterData,
+                                                getKeyColumnsName(), // order by
+                                                getOptions(sqlOptions, SqlOptions.MAX_LIMIT));
+            }
+
+            decode( list );
+
+            debug("rows", list.size());
+
+            return list;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    @Override
+    public List<Entity> findList(Entity filter) throws SQLException
+    {
+        return findList(filter, null);
+    }
+
+    @Override
+    public List<Entity> findList(Entity filter, SqlOptions sqlOptions) throws SQLException
+    {
+        super.debug("findList", filter, sqlOptions);
+
+        try
+        {
+            // filter
+            Map<String, Object> filterData = new LinkedHashMap<>();
+            Map<String, Object> filterColumns = getFilterColumnsMap(filter, filterData);
+
+            List<Entity> list;
+
+            if (isInvalidFilter(filterColumns, sqlOptions))
+            {
+                // no filter --> list all
+                list = getJdbiCrudDao().getAll(getTableName(),
+                                               getSelectColumns(sqlOptions),
+                                               getKeyColumnsName(), // order by
+                                               getOptions(sqlOptions, SqlOptions.MAX_LIMIT));
+            }
+            else
+            {
+                list = getJdbiCrudDao().findList(getTableName(),
+                                                 getSelectColumns(sqlOptions),
+                                                 filterColumns,
+                                                 filterData,
+                                                 getKeyColumnsName(), // order by
+                                                 getOptions(sqlOptions, SqlOptions.MAX_LIMIT));
+            }
+
+            decode( list );
+
+            debug("rows", list.size());
+
+            return list;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    @Override
+    public List<Entity> getAll() throws SQLException
+    {
+        return getAll(null);
+    }
+
+    @Override
+    public List<Entity> getAll(SqlOptions sqlOptions) throws SQLException
+    {
+        super.debug("getAll", sqlOptions);
+
+        try
+        {
+            List<Entity> list = getJdbiCrudDao().getAll(getTableName(),
+                                                        getSelectColumns(sqlOptions),
+                                                        getKeyColumnsName(), // order by
+                                                        getOptions(sqlOptions, SqlOptions.MAX_LIMIT));
+
+            decode( list );
+
+            debug("rows", list.size());
+
+            return list;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    //
+    // Create
+    //
+
+    @Override
+    public void create(Entity entity) throws SQLException
+    {
+        super.debug("create", entity);
+
+        try
+        {
+            // all columns
+            Map<String, Object> entityData = new LinkedHashMap<>();
+            Map<String, Object> entityColumns = getEntityColumnsMap(entity, false, entityData);
+
+            // remove generated keys with null values
+            removeGeneratedKeysWithNullValues(entityColumns, entityData);
+
+            if (isEmpty(entityColumns))
+            {
+                debug("entity is empty --> inserted rows", 0);
+                return;
+            }
+
+            if (!isEmpty(getGeneratedKeyColumnNames()))
+            {
+                GeneratedKey id = getJdbiCrudDao().createWithGeneratedKeys(getTableName(), entityColumns, entityData);
+                setGeneratedKey(entity, id);
+            }
+            else
+            {
+                getJdbiCrudDao().create(getTableName(), entityColumns, entityData);
+            }
+
+            debug("inserted rows", 1);
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    //
+    // Update
+    //
+
+    @Override
+    public int updateById(Entity entity) throws SQLException
+    {
+        super.debug("updateById", entity);
+
+        try
+        {
+            // key filter
+            Map<String, Object> keyData = new LinkedHashMap<>();
+            Map<String, Object> keyColumns = getEntityKeyColumnsMap(entity, keyData);
+
+            if (isInvalidKey(keyColumns))
+            {
+                debug("invalid Id --> updated rows", 0);
+                return 0;
+            }
+
+            // update all columns
+            Map<String, Object> entityData = new LinkedHashMap<>();
+            Map<String, Object> entityColumns = getEntityColumnsMap(entity, false, entityData);
+
+            // not update keys with their own values
+            removeKeys(entityColumns, entityData);
+
+            if (isEmpty(entityColumns))
+            {
+                debug("entity is empty --> updated rows", 0);
+                return 0;
+            }
+
+            int updated = getJdbiCrudDao().update(getTableName(),
+                                                  entityColumns,
+                                                  entityData,
+                                                  keyColumns,
+                                                  keyData,
+                                                  getOptions(null));
+
+            debug("updated rows", updated);
+
+            return updated;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    @Override
+    public int modifyById(Entity entity) throws SQLException
+    {
+        super.debug("modifyById", entity);
+
+        try
+        {
+            // key filter
+            Map<String, Object> keyData = new LinkedHashMap<>();
+            Map<String, Object> keyColumns = getEntityKeyColumnsMap(entity, keyData);
+
+            if (isInvalidKey(keyColumns))
+            {
+                debug("invalid Id --> updated rows", 0);
+                return 0;
+            }
+
+            // update columns not null
+            Map<String, Object> entityData = new LinkedHashMap<>();
+            Map<String, Object> entityColumns = getEntityColumnsMap(entity, true, entityData);
+
+            // not update keys with their own values
+            removeKeys(entityColumns, entityData);
+
+            if (isEmpty(entityColumns))
+            {
+                debug("entity is empty --> updated rows", 0);
+                return 0;
+            }
+
+            int updated = getJdbiCrudDao().update(getTableName(),
+                                                  entityColumns,
+                                                  entityData,
+                                                  keyColumns,
+                                                  keyData,
+                                                  getOptions(null));
+
+            debug("updated rows", updated);
+
+            return updated;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    @Override
+    public int updateMany(Entity entity, Entity filter) throws SQLException
+    {
+        return updateMany(entity, filter, null);
+    }
+
+    @Override
+    public int updateMany(Entity entity, Entity filter, SqlOptions sqlOptions) throws SQLException
+    {
+        super.debug("updateMany", entity, filter, sqlOptions);
+
+        try
+        {
+            // filter
+            Map<String, Object> filterData = new LinkedHashMap<>();
+            Map<String, Object> filterColumns = getFilterColumnsMap(filter, filterData);
+
+            if (isInvalidFilter(filterColumns, sqlOptions))
+            {
+                debug("filter is empty --> updated rows", 0);
+                return 0;
+            }
+
+            // update all columns
+            Map<String, Object> entityData = new LinkedHashMap<>();
+            Map<String, Object> entityColumns = getEntityColumnsMap(entity, false, entityData);
+
+            // not update keys with their own values
+            removeKeys(entityColumns, entityData);
+
+            if (isEmpty(entityColumns))
+            {
+                debug("entity is empty --> updated rows", 0);
+                return 0;
+            }
+
+            int updated = getJdbiCrudDao().update(getTableName(),
+                                                  entityColumns,
+                                                  entityData,
+                                                  filterColumns,
+                                                  filterData,
+                                                  getOptions(sqlOptions));
+
+            debug("updated rows", updated);
+
+            return updated;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    @Override
+    public int modifyMany(Entity entity, Entity filter) throws SQLException
+    {
+        return modifyMany(entity, filter, null);
+    }
+
+    @Override
+    public int modifyMany(Entity entity, Entity filter, SqlOptions sqlOptions) throws SQLException
+    {
+        super.debug("modifyMany", entity, filter, sqlOptions);
+
+        try
+        {
+            // filter
+            Map<String, Object> filterData = new LinkedHashMap<>();
+            Map<String, Object> filterColumns = getFilterColumnsMap(filter, filterData);
+
+            if (isInvalidFilter(filterColumns, sqlOptions))
+            {
+                debug("filter is empty --> updated rows", 0);
+                return 0;
+            }
+
+            // update columns not null
+            Map<String, Object> entityData = new LinkedHashMap<>();
+            Map<String, Object> entityColumns = getEntityColumnsMap(entity, true, entityData);
+
+            // not update keys with their own values
+            removeKeys(entityColumns, entityData);
+
+            if (isEmpty(entityColumns))
+            {
+                debug("entity is empty --> updated rows", 0);
+                return 0;
+            }
+
+            int updated = getJdbiCrudDao().update(getTableName(),
+                                                  entityColumns,
+                                                  entityData,
+                                                  filterColumns,
+                                                  filterData,
+                                                  getOptions(sqlOptions));
+
+            debug("updated rows", updated);
+
+            return updated;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    //
+    // Delete
+    //
+
+    @Override
+    public int deleteById(Key id) throws SQLException
+    {
+        super.debug("deleteById", id);
+
+        try
+        {
+            // key filter
+            Map<String, Object> keyData = new LinkedHashMap<>();
+            Map<String, Object> keyColumns = getKeyColumnsMap(id, keyData);
+
+            if (isInvalidKey(keyColumns))
+            {
+                debug("invalid Id --> deleted rows", 0);
+                return 0;
+            }
+
+            int deleted = getJdbiCrudDao().delete(getTableName(), keyColumns, keyData, getOptions(null));
+
+            debug("deleted rows", deleted);
+
+            return deleted;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    //int deleteInIds(Long... ids) throws SQLException;
+
+
+    @Override
+    public int deleteMany(Entity filter) throws SQLException
+    {
+        return deleteMany(filter, null);
+    }
+
+    @Override
+    public int deleteMany(Entity filter, SqlOptions sqlOptions) throws SQLException
+    {
+        super.debug("deleteMany", filter, sqlOptions);
+
+        try
+        {
+            // filter
+            Map<String, Object> filterData = new LinkedHashMap<>();
+            Map<String, Object> filterColumns = getFilterColumnsMap(filter, filterData);
+
+            if (isInvalidFilter(filterColumns, sqlOptions))
+            {
+                debug("invalid filter --> deleted rows", 0);
+                return 0;
+            }
+
+            int deleted = getJdbiCrudDao().delete(getTableName(), filterColumns, filterData, getOptions(sqlOptions));
+
+            debug("deleted rows", deleted);
+
+            return deleted;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+
+    @Override
+    public int deleteAll() throws SQLException
+    {
+        super.debug("deleteAll");
+
+        try
+        {
+            int deleted = getJdbiCrudDao().deleteAll( getTableName() );
+
+            debug("deleted rows", deleted);
+
+            return deleted;
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+}
+

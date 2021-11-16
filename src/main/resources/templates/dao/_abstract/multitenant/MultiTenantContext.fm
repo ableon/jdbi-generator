@@ -1,0 +1,62 @@
+package ${MultiTenantDaoPackage};
+
+
+public class MultiTenantContext
+{
+    private static class TenantInfo
+    {
+        private String id;
+        private String schema;
+        protected TenantInfo() {}
+        protected String getId() { return id; }
+        protected void setId(String id ) { this.id = id; }
+        protected String getSchema() { return schema; }
+        protected void setSchema(String schema ) { this.schema = schema; }
+    }
+
+    private static final ThreadLocal<TenantInfo> context = new InheritableThreadLocal<>();
+
+
+    private MultiTenantContext() {}
+
+
+    private static TenantInfo getTenantInfo()
+    {
+        TenantInfo tenantInfo = context.get();
+
+        if (tenantInfo == null)
+        {
+            tenantInfo = new TenantInfo();
+            context.set( tenantInfo );
+        }
+
+        return tenantInfo;
+    }
+
+    public static String getId()
+    {
+        return getTenantInfo().getId();
+    }
+
+    public static void setId(String id)
+    {
+        getTenantInfo().setId(id);
+    }
+
+    public static String getSchema()
+    {
+        return getTenantInfo().getSchema();
+    }
+
+    public static void setSchema(String schema)
+    {
+        getTenantInfo().setSchema(schema);
+    }
+
+    public static void clear()
+    {
+        context.remove();
+    }
+
+}
+

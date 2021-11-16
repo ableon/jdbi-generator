@@ -1,0 +1,97 @@
+package ${LookUpPackage};
+
+
+@SuppressWarnings("unchecked")
+public class LookUp
+{
+    public static final String VALUE = "value";
+    public static final String LABEL = "label";
+
+    private Object value;
+    private String label;
+
+
+    public LookUp() {}
+
+
+    public LookUp(Object value, String label)
+    {
+        this.value = value;
+        this.label = label;
+    }
+
+
+    public <T> T getValue()
+    {
+        return (T) value;
+    }
+
+
+    public void setValue(Object value)
+    {
+        this.value = value;
+    }
+
+
+    public String getLabel()
+    {
+        return label;
+    }
+
+
+    public void setLabel(String label)
+    {
+        this.label = label;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        StringBuilder builder = new StringBuilder(getClass().getSimpleName());
+        builder.append("{");
+        builder.append("value=").append(value);
+        builder.append(",label=").append(label);
+        builder.append("}");
+        return builder.toString();
+    }
+
+
+    //
+    // Builder
+    //
+
+    public static LookUp.LookUpBuilder builder()
+    {
+        return new LookUp.LookUpBuilder();
+    }
+
+    public static class LookUpBuilder
+    {
+        private final LookUp lookUp;
+
+        public LookUpBuilder()
+        {
+            this.lookUp = new LookUp();
+        }
+
+        public LookUp.LookUpBuilder value(Object value)
+        {
+            this.lookUp.setValue(value);
+            return this;
+        }
+
+        public LookUp.LookUpBuilder label(String label)
+        {
+            this.lookUp.setLabel(label);
+            return this;
+        }
+
+        public LookUp build()
+        {
+            return this.lookUp;
+        }
+    }
+
+}
+

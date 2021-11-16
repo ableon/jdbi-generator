@@ -1,0 +1,12 @@
+package ${EncoderDaoPackage};
+
+
+public interface Encoder
+{
+
+    String encode(String value);
+
+    String decode(String value);
+
+}
+

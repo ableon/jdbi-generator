@@ -1,0 +1,163 @@
+
+
+<statements namespace="CRUD">
+
+    <includes>
+        <include id="jdbi/@@DataSourceLowerCase@@/crud_macros.ftl" />
+        <include id="jdbi/@@DataSourceLowerCase@@/crud_macros_dialect.ftl" />
+    </includes>
+
+
+    <statement id="countList">
+    <![CDATA[
+
+        SELECT
+            COUNT(*)
+        FROM
+            <@table_name />
+        WHERE
+            <@equal_filter />
+
+    ]]>
+    </statement>
+
+
+    <statement id="countFind">
+    <![CDATA[
+
+        SELECT
+            COUNT(*)
+        FROM
+            <@table_name />
+        WHERE
+            <@find_filter />
+
+    ]]>
+    </statement>
+
+
+    <statement id="countAll">
+    <![CDATA[
+
+        SELECT
+            COUNT(*)
+        FROM
+            <@table_name />
+
+    ]]>
+    </statement>
+
+
+    <statement id="get">
+    <![CDATA[
+
+        <@begin_paginate />
+
+        SELECT
+            <@columns_name />
+        FROM
+            <@table_name />
+        WHERE
+            <@equal_filter />
+
+        <@columns_order />
+
+        <@end_paginate />
+
+    ]]>
+    </statement>
+
+
+    <statement id="find">
+    <![CDATA[
+
+        <@begin_paginate />
+
+        SELECT
+            <@columns_name />
+        FROM
+            <@table_name />
+        WHERE
+            <@find_filter />
+
+        <@columns_order />
+
+        <@end_paginate />
+
+    ]]>
+    </statement>
+
+
+    <statement id="getAll">
+    <![CDATA[
+
+        <@begin_paginate />
+
+        SELECT
+            <@columns_name />
+        FROM
+            <@table_name />
+
+        <@columns_order />
+
+        <@end_paginate />
+
+    ]]>
+    </statement>
+
+
+    <statement id="create">
+    <![CDATA[
+
+        INSERT INTO
+            <@table_name />
+        (
+            <@insert_columns />
+        )
+        VALUES
+        (
+            <@insert_values />
+        )
+
+    ]]>
+    </statement>
+
+
+    <statement id="update">
+    <![CDATA[
+
+        UPDATE
+            <@table_name />
+        SET
+            <@set_values />
+        WHERE
+            <@equal_filter />
+
+    ]]>
+    </statement>
+
+
+    <statement id="delete">
+    <![CDATA[
+
+        DELETE FROM
+            <@table_name />
+        WHERE
+            <@equal_filter />
+
+    ]]>
+    </statement>
+
+
+    <statement id="deleteAll">
+    <![CDATA[
+
+        DELETE FROM
+            <@table_name />
+
+    ]]>
+    </statement>
+
+
+</statements>
+

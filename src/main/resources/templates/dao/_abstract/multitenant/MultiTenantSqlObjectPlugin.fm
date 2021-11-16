@@ -1,0 +1,39 @@
+package ${MultiTenantDaoPackage};
+
+import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+
+
+public class MultiTenantSqlObjectPlugin extends SqlObjectPlugin
+{
+
+    public MultiTenantSqlObjectPlugin()
+    {
+        super();
+    }
+
+
+    @Override
+    public Connection customizeConnection(Connection connection) throws SQLException
+    {
+        String schema = getSchema();
+
+        if (schema != null)
+        {
+            connection.setSchema( schema );
+            connection.setCatalog( schema ); // MySQL
+        }
+
+        return connection;
+    }
+
+
+    public String getSchema()
+    {
+        return MultiTenantContext.getSchema();
+    }
+
+}
+

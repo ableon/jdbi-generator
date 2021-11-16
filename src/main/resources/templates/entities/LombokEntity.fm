@@ -1,0 +1,79 @@
+package ${EntitiesPackage};
+
+import lombok.*;
+import java.util.ArrayList;
+import java.util.List;
+<#list importList as import>
+import ${import};
+</#list>
+
+<#if builder>@Builder</#if>
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ${Entity}
+{
+    public static final String TABLE_NAME = "${TableName}";
+
+    <#list fieldDataList as fieldData>
+    public static final String ${fieldData.column}_COLUMN = "${fieldData.name}";
+    </#list>
+
+    public static final List<String> ColumnsName = new ArrayList<>();
+    static
+    {
+        <#list fieldDataList as fieldData>
+        ColumnsName.add( ${fieldData.column}_COLUMN );
+        </#list>
+    }
+
+    public static final List<String> KeyColumnsName = new ArrayList<>();
+    static
+    {
+        <#list pkFieldDataList as pkFieldData>
+        KeyColumnsName.add( ${pkFieldData.column}_COLUMN );
+        </#list>
+    }
+
+    public static final List<String> GeneratedKeyColumnNames = new ArrayList<>();
+    static
+    {
+        <#list generatedKeyDataList as generatedKeyData>
+        GeneratedKeyColumnNames.add( ${generatedKeyData.column}_COLUMN );
+        </#list>
+    }
+
+
+    <#list fieldDataList as fieldData>
+    <#if fieldData.invisible>@ToString.Exclude </#if>/** property ${fieldData.property}${fieldData.comment} */
+    private ${fieldData.type} ${fieldData.property};
+
+    </#list>
+    <#if isMultipleKey>
+
+    <#if builder>@Builder</#if>
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Key
+    {
+        <#list pkFieldDataList as pkFieldData>
+        private ${pkFieldData.type} ${pkFieldData.property};
+        </#list>
+    }
+    </#if>
+    <#if isMultipleGeneratedKey>
+
+    <#if builder>@Builder</#if>
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class GeneratedKey
+    {
+        <#list generatedKeyDataList as generatedKeyData>
+        private ${generatedKeyData.type} ${generatedKeyData.property};
+        </#list>
+    }
+    </#if>
+}
+

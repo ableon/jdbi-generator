@@ -1,0 +1,23 @@
+package ${CrudDaoPackage};
+
+import ${AbstractDaoPackage}.JdbiCrudDao;
+import ${AbstractDaoPackage}.freemarker.UseSqlLocator;
+import ${EntitiesPackage}.${Entity};
+import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
+import org.jdbi.v3.sqlobject.config.RegisterBeanMappers;
+
+
+@UseSqlLocator
+@RegisterBeanMappers
+({
+    <#if isMultipleGeneratedKey>
+    @RegisterBeanMapper(${GeneratedKey}.class),
+    </#if>
+    <#if isMultipleKey>
+    @RegisterBeanMapper(${Key}.class),
+    </#if>
+    @RegisterBeanMapper(${Entity}.class)
+})
+public interface ${ClassName}JdbiCrudDao extends JdbiCrudDao<${Entity}, ${Key}, ${GeneratedKey}>
+{}
+

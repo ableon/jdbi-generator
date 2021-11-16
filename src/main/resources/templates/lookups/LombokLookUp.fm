@@ -1,0 +1,14 @@
+package ${LookUpPackage};
+
+import lombok.*;
+
+<#if builder>@Builder</#if>
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class LookUp
+{
+    private Object value;
+    private String label;
+}
+

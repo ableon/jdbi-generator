@@ -1,0 +1,309 @@
+package ${FreemarkerDaoPackage};
+
+import freemarker.cache.TemplateLoader;
+import org.apache.xerces.jaxp.SAXParserFactoryImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.*;
+import org.xml.sax.helpers.DefaultHandler;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import java.io.*;
+import java.net.URI;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+
+/*
+    <!-- https://mvnrepository.com/artifact/xerces/xercesImpl -->
+    <dependency>
+        <groupId>xerces</groupId>
+        <artifactId>xercesImpl</artifactId>
+        <version>2.12.1</version>
+    </dependency>
+*/
+
+
+public class SqlTemplateLoader implements TemplateLoader
+{
+    protected Logger logger = LoggerFactory.getLogger( getClass() );
+
+    protected final Map<String, SqlTemplateSource> templatesMap = new LinkedHashMap<>();
+
+
+    public SqlTemplateLoader() {}
+
+
+    @Override
+    public Object findTemplateSource(String name) throws IOException
+    {
+        return templatesMap.get( name );
+    }
+
+
+    @Override
+    public long getLastModified(Object templateSource)
+    {
+        return ((SqlTemplateSource)templateSource).getLastModified();
+    }
+
+
+    @Override
+    public Reader getReader(Object templateSource, String encoding) throws IOException
+    {
+        //if (logger.isDebugEnabled())
+        //    logger.debug("Looking for Freemarker template: {}",
+        //                ((SqlTemplateLoader.SqlTemplateSource)templateSource).getSource());
+
+        return new StringReader( ((SqlTemplateSource)templateSource).getContent() );
+    }
+
+    @Override
+    public void closeTemplateSource(Object templateSource) throws IOException
+    {
+        // Do nothing
+    }
+
+
+    protected InputStream getResourceAsStream(String name)
+    {
+        return Thread.currentThread().getContextClassLoader().getResourceAsStream(name);
+    }
+
+
+    private boolean isJar(String path) throws IOException
+    {
+        URI uri = null;
+
+        try
+        {
+            uri = Thread.currentThread().getContextClassLoader().getResource(path).toURI();
+        }
+        catch (Exception e) { /* ignore */ }
+
+        if (uri == null)
+            throw new IOException("path '" + path + "' not found");
+
+        return (uri.getScheme().contains("jar"));
+    }
+
+
+    public void loadTemplates(List<String> templates) throws Exception
+    {
+        if (logger.isDebugEnabled())
+            logger.debug("loadTemplates: " + templates);
+
+        if (templates == null)
+            return;
+
+        XmlHandler xmlHandler = new XmlHandler();
+        SAXParserFactory saxParserFactory = new SAXParserFactoryImpl();
+        SAXParser parser = saxParserFactory.newSAXParser();
+        XMLReader xmlReader = parser.getXMLReader();
+        xmlReader.setErrorHandler( new XmlHandler.ErrHandler(logger) );
+        xmlReader.setContentHandler( xmlHandler );
+
+        for (String template : templates)
+        {
+            xmlHandler.getStatements().clear();
+
+            InputStream inputStream = getResourceAsStream( template );
+
+            if (inputStream == null)
+                throw new FileNotFoundException("template '" + template + "' not found");
+
+            try
+            {
+                // load template
+                xmlReader.parse( new InputSource(inputStream) );
+
+                // load includes
+                for (Map.Entry<String,String> includeMap : xmlHandler.getIncludes().entrySet())
+                {
+                    String includeName = includeMap.getKey();
+                    InputStream includeStream = getResourceAsStream(includeName);
+
+                    if (includeStream == null)
+                        throw new FileNotFoundException("include '" + includeName + "' not found");
+
+                    try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(includeStream)))
+                    {
+                        String includeContent = bufferedReader.lines().parallel().collect(Collectors.joining(System.lineSeparator()));
+                        templatesMap.put(includeName, new SqlTemplateSource(includeName, includeContent));
+                    }
+                }
+
+                xmlHandler.getStatements().forEach((statementName, statementContent) ->
+                {
+                    StringBuilder statementContentWithMacros = new StringBuilder();
+
+                    xmlHandler.getIncludes().values().forEach(include -> {
+                        statementContentWithMacros.append(include).append(System.lineSeparator());
+                    });
+
+                    statementContentWithMacros.append( statementContent );
+
+                    SqlTemplateSource sqlTemplateSource = new SqlTemplateSource(template, statementContentWithMacros.toString());
+
+                    templatesMap.put(statementName, sqlTemplateSource);
+                });
+            }
+            finally
+            {
+                try { inputStream.close(); } catch(Exception e) { /* ignore */ }
+            }
+        }
+    }
+
+
+    protected static class XmlHandler extends DefaultHandler
+    {
+        private final Map<String, String> includesMap = new LinkedHashMap<>();
+        private final Map<String, String> statementsMap = new LinkedHashMap<>();
+
+        private boolean isQuery;
+        private String namespace;
+        private String statementId;
+        private final StringBuilder statementText = new StringBuilder();
+
+        public XmlHandler()
+        {
+            super();
+        }
+
+        public Map<String, String> getIncludes()
+        {
+            return includesMap;
+        }
+
+        public Map<String, String> getStatements()
+        {
+            return statementsMap;
+        }
+
+        private boolean isNotEmpty(String str)
+        {
+            return (str != null && !str.trim().isEmpty());
+        }
+
+        private String getStatementId(String id)
+        {
+            return (isNotEmpty(namespace)) ? (namespace+"."+id) : id;
+        }
+
+        @Override
+        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException
+        {
+            if (qName.equalsIgnoreCase("includes"))
+            {
+
+            }
+            else
+            if (qName.equalsIgnoreCase("include"))
+            {
+                String id = attributes.getValue("id");
+                String include = "${'<#'}include \"" + id + "\"${'>'}";
+                includesMap.put(id, include);
+            }
+            if (qName.equalsIgnoreCase("statements"))
+            {
+                namespace = attributes.getValue("namespace");
+            }
+            else
+            if (qName.equalsIgnoreCase("statement"))
+            {
+                isQuery = true;
+                statementId = getStatementId(attributes.getValue("id"));
+                statementText.delete(0, statementText.length()); // reset to blank
+            }
+        }
+
+        @Override
+        public void endElement(String uri, String localName, String qName) throws SAXException
+        {
+            if (isQuery && statementId != null && !statementId.isEmpty() && statementText.length() > 0)
+            {
+                statementsMap.put(statementId, statementText.toString().trim());
+                isQuery     = false;
+                statementId = null;
+            }
+        }
+
+        @Override
+        public void characters(char[] ch, int start, int length) throws SAXException
+        {
+            if (isQuery)
+            {
+                String line = new String(ch, start, length);
+                this.statementText.append(line);
+            }
+        }
+
+
+        protected static class ErrHandler implements ErrorHandler
+        {
+            private final Logger logger;
+
+            public ErrHandler(Logger logger)
+            {
+                this.logger = logger;
+            }
+
+            private String getParseExceptionInfo(SAXParseException spe)
+            {
+                String systemId = spe.getSystemId();
+
+                if (systemId == null)
+                    systemId = "null";
+
+                return "URI=" + systemId + " line=" + spe.getLineNumber() + ": " + spe.getMessage();
+            }
+
+            @Override
+            public void warning(SAXParseException spe) throws SAXException
+            {
+                logger.warn( getParseExceptionInfo(spe) );
+            }
+
+            @Override
+            public void error(SAXParseException spe) throws SAXException
+            {
+                String message = "Error: " + getParseExceptionInfo( spe );
+                throw new SAXException( message );
+            }
+
+            @Override
+            public void fatalError(SAXParseException spe) throws SAXException
+            {
+                String message = "Fatal Error: " + getParseExceptionInfo( spe );
+                throw new SAXException( message );
+            }
+        }
+    }
+
+
+    protected static class SqlTemplateSource
+    {
+        private final String source;
+        private final String content;
+        private final long lastModified;
+
+        public SqlTemplateSource(String source, String content)
+        {
+            this.source = source;
+            this.content = content;
+            this.lastModified = System.currentTimeMillis();
+        }
+
+        public String getSource() { return source; }
+
+        public String getContent() { return content; }
+
+        public long getLastModified() { return lastModified; }
+    }
+
+}
+

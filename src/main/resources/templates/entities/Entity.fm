@@ -1,0 +1,256 @@
+package ${EntitiesPackage};
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+<#list importList as import>
+import ${import};
+</#list>
+
+
+public class ${Entity}
+{
+    public static final String TABLE_NAME = "${TableName}";
+
+    <#list fieldDataList as fieldData>
+    public static final String ${fieldData.column}_COLUMN = "${fieldData.name}";
+    </#list>
+
+    public static final List<String> ColumnsName = new ArrayList<>();
+    static
+    {
+        <#list fieldDataList as fieldData>
+        ColumnsName.add( ${fieldData.column}_COLUMN );
+        </#list>
+    }
+
+    public static final List<String> KeyColumnsName = new ArrayList<>();
+    static
+    {
+        <#list pkFieldDataList as pkFieldData>
+        KeyColumnsName.add( ${pkFieldData.column}_COLUMN );
+        </#list>
+    }
+
+    public static final List<String> GeneratedKeyColumnNames = new ArrayList<>();
+    static
+    {
+        <#list generatedKeyDataList as generatedKeyData>
+        GeneratedKeyColumnNames.add( ${generatedKeyData.column}_COLUMN );
+        </#list>
+    }
+
+
+    <#list fieldDataList as fieldData>
+    /** property ${fieldData.property}${fieldData.comment} */
+    private ${fieldData.type} ${fieldData.property};
+
+    </#list>
+
+    public ${Entity}() {}
+
+    <#list fieldDataList as fieldData>
+
+    public ${fieldData.type} ${fieldData.getter}()
+    {
+        return ${fieldData.property};
+    }
+
+    public void ${fieldData.setter}(${fieldData.type} ${fieldData.property})
+    {
+        this.${fieldData.property} = ${fieldData.property};
+    }
+    </#list>
+
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+        sb.append("{");
+        <#list fieldDataList as fieldData>
+        <#if !fieldData.invisible>
+        <#if fieldData?index == 0>
+        sb.append("${fieldData.property}=").append(${fieldData.property});
+        <#else>
+        sb.append(",${fieldData.property}=").append(${fieldData.property});
+        </#if>
+        </#if>
+        </#list>
+        sb.append("}");
+        return sb.toString();
+    }
+    <#if isMultipleKey>
+
+    public static class Key
+    {
+        <#list pkFieldDataList as pkFieldData>
+        private ${pkFieldData.type} ${pkFieldData.property};
+        </#list>
+
+        public Key() {}
+
+        <#list pkFieldDataList as pkFieldData>
+        public ${pkFieldData.type} ${pkFieldData.getter}()
+        {
+            return ${pkFieldData.property};
+        }
+
+        public void ${pkFieldData.setter}(${pkFieldData.type} ${pkFieldData.property})
+        {
+            this.${pkFieldData.property} = ${pkFieldData.property};
+        }
+
+        </#list>
+        @Override
+        public String toString()
+        {
+            StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+            sb.append("{");
+            <#list pkFieldDataList as pkFieldData>
+            <#if pkFieldData?index == 0>
+            sb.append("${pkFieldData.property}=").append(${pkFieldData.property});
+            <#else>
+            sb.append(",${pkFieldData.property}=").append(${pkFieldData.property});
+            </#if>
+            </#list>
+            sb.append("}");
+            return sb.toString();
+        }
+        <#if builder>
+
+        public static KeyBuilder builder()
+        {
+            return new KeyBuilder();
+        }
+
+        public static class KeyBuilder
+        {
+            private final Key key;
+
+            public KeyBuilder()
+            {
+                this.key = new Key();
+            }
+
+            <#list pkFieldDataList as pkFieldData>
+            public KeyBuilder ${pkFieldData.property}(${pkFieldData.type} ${pkFieldData.property})
+            {
+                this.key.${pkFieldData.setter}( ${pkFieldData.property} );
+                return this;
+            }
+
+            </#list>
+            public Key build()
+            {
+                return key;
+            }
+        }
+        </#if>
+    }
+    </#if>
+    <#if isMultipleGeneratedKey>
+
+    public static class GeneratedKey
+    {
+        <#list generatedKeyDataList as generatedKeyData>
+        private ${generatedKeyData.type} ${generatedKeyData.property};
+        </#list>
+
+        public GeneratedKey() {}
+
+        <#list generatedKeyDataList as generatedKeyData>
+        public ${generatedKeyData.type} ${generatedKeyData.getter}()
+        {
+            return ${generatedKeyData.property};
+        }
+
+        public void ${generatedKeyData.setter}(${generatedKeyData.type} ${generatedKeyData.property})
+        {
+            this.${generatedKeyData.property} = ${generatedKeyData.property};
+        }
+
+        </#list>
+        @Override
+        public String toString()
+        {
+            StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+            sb.append("{");
+            <#list generatedKeyDataList as generatedKeyData>
+            <#if generatedKeyData?index == 0>
+            sb.append("${generatedKeyData.property}=").append(${generatedKeyData.property});
+            <#else>
+            sb.append(",${generatedKeyData.property}=").append(${generatedKeyData.property});
+            </#if>
+            </#list>
+            sb.append("}");
+            return sb.toString();
+        }
+        <#if builder>
+
+        public static GeneratedKeyBuilder builder()
+        {
+            return new GeneratedKeyBuilder();
+        }
+
+        public static class GeneratedKeyBuilder
+        {
+            private final GeneratedKey generatedKey;
+
+            public GeneratedKeyBuilder()
+            {
+                this.generatedKey = new GeneratedKey();
+            }
+
+            <#list generatedKeyDataList as generatedKeyData>
+            public GeneratedKeyBuilder ${generatedKeyData.property}(${generatedKeyData.type} ${generatedKeyData.property})
+            {
+                this.generatedKey.${generatedKeyData.setter}( ${generatedKeyData.property} );
+                return this;
+            }
+
+            </#list>
+            public GeneratedKey build()
+            {
+                return generatedKey;
+            }
+        }
+        </#if>
+    }
+    </#if>
+    <#if builder>
+
+    //
+    // Builder
+    //
+
+    public static ${Entity}Builder builder()
+    {
+        return new ${Entity}Builder();
+    }
+
+    public static class ${Entity}Builder
+    {
+        private final ${Entity} ${entity};
+
+        public ${Entity}Builder()
+        {
+            this.${entity} = new ${Entity}();
+        }
+
+        <#list fieldDataList as fieldData>
+        public ${Entity}Builder ${fieldData.property}(${fieldData.type} ${fieldData.property})
+        {
+            this.${entity}.${fieldData.setter}( ${fieldData.property} );
+            return this;
+        }
+
+        </#list>
+        public ${Entity} build()
+        {
+            return ${entity};
+        }
+    }
+    </#if>
+}
+

@@ -1,0 +1,159 @@
+package ${ConfigPackage};
+
+import ${AbstractDaoPackage}.encoder.Encoder;
+import ${AbstractDaoPackage}.encoder.XOREncoder;
+import ${AbstractDaoPackage}.freemarker.SqlTemplateLoader;
+import freemarker.cache.TemplateLoader;
+import org.jdbi.v3.core.Handles;
+import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.statement.ColonPrefixSqlParser;
+import org.jdbi.v3.core.statement.SqlLogger;
+import org.jdbi.v3.core.statement.SqlStatements;
+import org.jdbi.v3.core.statement.StatementContext;
+import org.jdbi.v3.freemarker.FreemarkerConfig;
+import org.jdbi.v3.freemarker.FreemarkerEngine;
+import org.jdbi.v3.sqlobject.SqlObjectPlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
+import javax.sql.DataSource;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+
+/*
+    <properties>
+        <!-- Java8 -->
+        <jdbi3.version>3.18.1</jdbi3.version>
+        <!-- Java8+ -->
+        <!-- jdbi3.version>3.22.0</jdbi3.version -->
+    </properties>
+
+    <!-- https://mvnrepository.com/artifact/org.jdbi/jdbi3-core -->
+    <dependency>
+        <groupId>org.jdbi</groupId>
+        <artifactId>jdbi3-core</artifactId>
+        <version>${"$"}{jdbi3.version}</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.jdbi/jdbi3-freemarker -->
+    <dependency>
+        <groupId>org.jdbi</groupId>
+        <artifactId>jdbi3-freemarker</artifactId>
+        <version>${"$"}{jdbi3.version}</version>
+    </dependency>
+*/
+
+@Configuration
+public class ${ClassName}JdbiConfig
+{
+    public static final String ENCODER = ${ClassName}DataSourceConfig.NAME + "Encoder";
+    public static final String JDBI    = ${ClassName}DataSourceConfig.NAME + "Jdbi";
+
+    @Autowired
+    @Qualifier(${ClassName}DataSourceConfig.DATASOURCE)
+    private DataSource dataSource;
+
+
+
+    @Bean(ENCODER)
+    public Encoder encoder()
+    {
+        return new XOREncoder();
+    }
+
+
+    private TemplateLoader templateLoader() throws Exception
+    {
+        SqlTemplateLoader sqlTemplateLoader = new SqlTemplateLoader();
+
+        final String path = "jdbi/${DataSourceLowerCase}/";
+        final String extension = "ftl.xml";
+
+        List<String> resourceTemplates = new ArrayList<>();
+
+        PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        Resource[] resources = resolver.getResources(path + "*." + extension);
+        for (Resource resource : resources)
+            resourceTemplates.add( path + resource.getFilename() );
+
+        sqlTemplateLoader.loadTemplates( resourceTemplates );
+
+        return sqlTemplateLoader;
+    }
+
+
+    @Bean(JDBI)
+    public Jdbi jdbi() throws Exception
+    {
+        // JDBI wants to control the Connection wrap the datasource in a proxy
+        // That is aware of the Spring managed transaction
+        TransactionAwareDataSourceProxy dataSourceProxy = new TransactionAwareDataSourceProxy( dataSource );
+        Jdbi jdbi = Jdbi.create( dataSourceProxy );
+
+        // force end transactions --> important!!
+        jdbi.getConfig(Handles.class).setForceEndTransactions(false);
+
+        // sql parser
+        jdbi.setSqlParser( new ColonPrefixSqlParser() );        // use ColonPrefix (:paramName)
+        //jdbi.setSqlParser( new HashPrefixSqlParser() );         // use HashPrefix (#paramName)
+
+        // template engine
+        jdbi.setTemplateEngine( new FreemarkerEngine() );       // use Freemarker
+
+        // template loader
+        jdbi.getConfig(FreemarkerConfig.class).getFreemarkerConfiguration().setTemplateLoader( templateLoader() );
+
+        // sql object plugin
+        jdbi.installPlugin( new SqlObjectPlugin() );            // use SqlObject
+        //jdbi.installPlugin( new MultiTenantSqlObjectPlugin() ); // use MultiTenantSqlObjectPlugin
+
+        // config binding --> important!!
+        jdbi.getConfig(SqlStatements.class).setUnusedBindingAllowed( true );
+
+        // sql logger
+        jdbi.setSqlLogger(new SqlLogger()
+        {
+            private final Logger logger = LoggerFactory.getLogger(Jdbi.class);
+
+            @Override
+            public void logBeforeExecution(StatementContext context)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    //System.out.println("binding: " + context.getBinding().toString());
+                }
+            }
+
+            @Override
+            public void logAfterExecution(StatementContext context)
+            {
+                if (logger.isDebugEnabled())
+                {
+                    String clazz  = context.getExtensionMethod().getType().getSimpleName();
+                    String method = context.getExtensionMethod().getMethod().getName();
+                    String query  = context.getRawSql();
+
+                    logger.debug("{}.{} -> Query: \"{}\" ({} ms) -> {} {}",
+                                 clazz,
+                                 method,
+                                 query,
+                                 context.getElapsedTime(ChronoUnit.MILLIS),
+                                 System.lineSeparator()+"\t",
+                                 context.getRenderedSql());
+                                 //context.getParsedSql());
+                }
+            }
+        });
+
+        return jdbi;
+    }
+
+}
+

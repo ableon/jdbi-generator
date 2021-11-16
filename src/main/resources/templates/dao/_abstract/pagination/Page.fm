@@ -1,0 +1,117 @@
+package ${PaginationDaoPackage};
+
+import ${AbstractDaoPackage}.SqlOptions;
+
+import java.util.List;
+
+
+public class Page<T>
+{
+    private Integer total;
+    private Integer count;
+    private Integer offset;
+    private Integer limit;
+    private List<T> content;
+
+
+    public Page() {}
+
+
+    public Page(Integer total, Integer count, List<T> content)
+    {
+        this(total, count, null, null, content);
+    }
+
+
+    public Page(Integer total, Integer count, Integer offset, Integer limit, List<T> content)
+    {
+        setTotal( total );
+        setCount( count );
+        setOffset( offset );
+        setLimit( limit );
+        setContent( content );
+    }
+
+
+    public static <T> Page<T> create(Integer total, Integer count, Integer offset, Integer limit, List<T> content)
+    {
+        return new Page<>(total, count, offset, limit, content);
+    }
+
+
+    public int getTotal()
+    {
+        return total;
+    }
+
+
+    public void setTotal(Integer total)
+    {
+        this.total = total;
+    }
+
+
+    public Integer getCount()
+    {
+        return count;
+    }
+
+
+    public void setCount(Integer count)
+    {
+        this.count = count;
+    }
+
+
+    public Integer getOffset()
+    {
+        return offset;
+    }
+
+
+    public void setOffset(Integer offset)
+    {
+        this.offset = (offset != null) ? offset : 0;
+    }
+
+
+    public Integer getLimit()
+    {
+        return limit;
+    }
+
+
+    public void setLimit(Integer limit)
+    {
+        this.limit = (limit != null) ? limit : SqlOptions.MAX_LIMIT;
+    }
+
+
+    public List<T> getContent()
+    {
+        return content;
+    }
+
+
+    public void setContent(List<T> content)
+    {
+        this.content = content;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+        sb.append("{");
+        sb.append("total=").append(total);
+        sb.append(",count=").append(count);
+        sb.append(",offset=").append(offset);
+        sb.append(",limit=").append(limit);
+        sb.append(",content=").append(content);
+        sb.append("}");
+        return sb.toString();
+    }
+
+}
+

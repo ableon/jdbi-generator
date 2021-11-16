@@ -1,0 +1,63 @@
+package ${ConfigPackage};
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import javax.sql.DataSource;
+<#if !jta>
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+<#else>
+import com.atomikos.jdbc.AtomikosDataSourceBean;
+</#if>
+
+
+@Configuration
+@PropertySource(value = "classpath:/${datasources}/${type}.${DataSourcePropertiesName}.properties")
+public class ${ClassName}DataSourceConfig
+{
+    public static final String NAME = "${ClassName}";
+    public static final String DATASOURCE = NAME + "DataSource";
+    <#if !jta>
+    public static final String TRANSACTION_MANAGER = NAME + "TransactionManager";
+
+
+
+    @Bean(DATASOURCE)
+    public DataSource dataSource()
+    {
+        return new HikariDataSource( ${objectName}HikariConfig() );
+    }
+
+
+    @Bean
+    @ConfigurationProperties(prefix = "spring.hikari.datasource.${DataSourcePropertiesName}")
+    protected HikariConfig ${objectName}HikariConfig()
+    {
+        return new HikariConfig();
+    }
+
+
+    @Bean(TRANSACTION_MANAGER)
+    public PlatformTransactionManager transactionManager()
+    {
+        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager();
+        transactionManager.setDataSource( dataSource() );
+        return transactionManager;
+    }
+    <#else>
+
+
+    @Bean(DATASOURCE)
+    @ConfigurationProperties(prefix = "spring.jta.atomikos.datasource.${DataSourcePropertiesName}")
+    public DataSource dataSource()
+    {
+        return new AtomikosDataSourceBean();
+    }
+    </#if>
+
+}
+

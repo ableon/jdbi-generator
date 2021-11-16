@@ -1,0 +1,191 @@
+package ${AbstractDaoPackage};
+
+import org.jdbi.v3.sqlobject.customizer.BindMap;
+import org.jdbi.v3.sqlobject.customizer.Define;
+import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
+import org.jdbi.v3.sqlobject.statement.SqlQuery;
+import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+
+import java.util.List;
+import java.util.Map;
+
+
+public interface JdbiCrudDao<Entity, Key, GeneratedKey>
+{
+    String CRUD             = "CRUD";
+    String TABLE            = "tableName";
+    String COLUMNS_NAME     = "columnsName";
+    String ENTITY_COLUMNS   = "entityColumns";
+    String ENTITY           = "entity";
+    String FILTER_COLUMNS   = "filterColumns";
+    String FILTER           = "filter";
+    String ORDER            = "order";
+    String OPTIONS          = "options";
+
+
+    @SqlQuery(CRUD + ".countList")
+    int countList
+    (
+        @Define(TABLE) String tableName,
+        @Define(FILTER_COLUMNS) Map<String,Object> filterColumns,
+        @Define(FILTER) @BindMap(FILTER) Map<String,Object> filterData,
+        @Define(OPTIONS) @BindMap(OPTIONS) Map<String,Object> options
+    );
+
+
+    @SqlQuery(CRUD + ".countFind")
+    int countFind
+    (
+        @Define(TABLE) String tableName,
+        @Define(FILTER_COLUMNS) Map<String,Object> filterColumns,
+        @Define(FILTER) @BindMap(FILTER) Map<String,Object> filterData,
+        @Define(OPTIONS) @BindMap(OPTIONS) Map<String,Object> options
+    );
+
+
+    @SqlQuery(CRUD + ".countAll")
+    int countAll
+    (
+        @Define(TABLE) String tableName
+    );
+
+
+    @SqlQuery(CRUD + ".get")
+    Key getId
+    (
+        @Define(TABLE) String tableName,
+        @Define(COLUMNS_NAME) List<String> keyColumnsName,
+        @Define(FILTER_COLUMNS) @BindMap(FILTER_COLUMNS) Map<String,Object> filterColumns,
+        @Define(FILTER) @BindMap(FILTER) Map<String,Object> filterData,
+        @Define(OPTIONS) @BindMap(OPTIONS) Map<String,Object> options
+    );
+
+
+    @SqlQuery(CRUD + ".get")
+    List<Key> getIds
+    (
+        @Define(TABLE) String tableName,
+        @Define(COLUMNS_NAME) List<String> keyColumnsName,
+        @Define(FILTER_COLUMNS) @BindMap(FILTER_COLUMNS) Map<String,Object> filterColumns,
+        @Define(FILTER) @BindMap(FILTER) Map<String,Object> filterData,
+        @Define(ORDER) List<String> orderBy,
+        @Define(OPTIONS) @BindMap(OPTIONS) Map<String,Object> options
+    );
+
+
+    @SqlQuery(CRUD + ".find")
+    List<Key> findIds
+    (
+        @Define(TABLE) String tableName,
+        @Define(COLUMNS_NAME) List<String> keyColumnsName,
+        @Define(FILTER_COLUMNS) @BindMap(FILTER_COLUMNS) Map<String,Object> filterColumns,
+        @Define(FILTER) @BindMap(FILTER) Map<String,Object> filterData,
+        @Define(ORDER) List<String> orderBy,
+        @Define(OPTIONS) @BindMap(OPTIONS) Map<String,Object> options
+    );
+
+
+    @SqlQuery(CRUD + ".getAll")
+    List<Key> getAllIds
+    (
+        @Define(TABLE) String tableName,
+        @Define(COLUMNS_NAME) List<String> keyColumnsName,
+        @Define(ORDER) List<String> orderBy,
+        @Define(OPTIONS) @BindMap(OPTIONS) Map<String,Object> options
+    );
+
+
+    @SqlQuery(CRUD + ".get")
+    Entity get
+    (
+        @Define(TABLE) String tableName,
+        @Define(COLUMNS_NAME) List<String> columnsName,
+        @Define(FILTER_COLUMNS) @BindMap(FILTER_COLUMNS) Map<String,Object> filterColumns,
+        @Define(FILTER) @BindMap(FILTER) Map<String,Object> filterData,
+        @Define(OPTIONS) @BindMap(OPTIONS) Map<String,Object> options
+    );
+
+
+    @SqlQuery(CRUD + ".get")
+    List<Entity> getList
+    (
+        @Define(TABLE) String tableName,
+        @Define(COLUMNS_NAME) List<String> columnsName,
+        @Define(FILTER_COLUMNS) @BindMap(FILTER_COLUMNS) Map<String,Object> filterColumns,
+        @Define(FILTER) @BindMap(FILTER) Map<String,Object> filterData,
+        @Define(ORDER) List<String> orderBy,
+        @Define(OPTIONS) @BindMap(OPTIONS) Map<String,Object> options
+    );
+
+
+    @SqlQuery(CRUD + ".find")
+    List<Entity> findList
+    (
+        @Define(TABLE) String tableName,
+        @Define(COLUMNS_NAME) List<String> columnsName,
+        @Define(FILTER_COLUMNS) @BindMap(FILTER_COLUMNS) Map<String,Object> filterColumns,
+        @Define(FILTER) @BindMap(FILTER) Map<String,Object> filterData,
+        @Define(ORDER) List<String> orderBy,
+        @Define(OPTIONS) @BindMap(OPTIONS) Map<String,Object> options
+    );
+
+
+    @SqlQuery(CRUD + ".getAll")
+    List<Entity> getAll
+    (
+        @Define(TABLE) String tableName,
+        @Define(COLUMNS_NAME) List<String> columnsName,
+        @Define(ORDER) List<String> orderBy,
+        @Define(OPTIONS) @BindMap(OPTIONS) Map<String,Object> options
+    );
+
+
+    @SqlUpdate(CRUD + ".create")
+    @GetGeneratedKeys
+    GeneratedKey createWithGeneratedKeys
+    (
+        @Define(TABLE) String tableName,
+        @Define(ENTITY_COLUMNS) @BindMap(ENTITY_COLUMNS) Map<String,Object> entityColumns,
+        @Define(ENTITY) @BindMap(ENTITY) Map<String,Object> entityData
+    );
+
+
+    @SqlUpdate(CRUD + ".create")
+    void create
+    (
+        @Define(TABLE) String tableName,
+        @Define(ENTITY_COLUMNS) @BindMap(ENTITY_COLUMNS) Map<String,Object> entityColumns,
+        @Define(ENTITY) @BindMap(ENTITY) Map<String,Object> entityData
+    );
+
+
+    @SqlUpdate(CRUD + ".update")
+    int update
+    (
+        @Define(TABLE) String tableName,
+        @Define(ENTITY_COLUMNS) @BindMap(ENTITY_COLUMNS) Map<String,Object> entityColumns,
+        @Define(ENTITY) @BindMap(ENTITY) Map<String,Object> entityData,
+        @Define(FILTER_COLUMNS) @BindMap(FILTER_COLUMNS) Map<String,Object> filterColumns,
+        @Define(FILTER) @BindMap(FILTER) Map<String,Object> filterData,
+        @Define(OPTIONS) @BindMap(OPTIONS) Map<String,Object> options
+    );
+
+
+    @SqlUpdate(CRUD + ".delete")
+    int delete
+    (
+        @Define(TABLE) String tableName,
+        @Define(FILTER_COLUMNS) @BindMap(FILTER_COLUMNS) Map<String,Object> filterColumns,
+        @Define(FILTER) @BindMap(FILTER) Map<String,Object> filterData,
+        @Define(OPTIONS) @BindMap(OPTIONS) Map<String,Object> options
+    );
+
+
+    @SqlUpdate(CRUD + ".deleteAll")
+    int deleteAll
+    (
+        @Define(TABLE) String tableName
+    );
+
+}
+

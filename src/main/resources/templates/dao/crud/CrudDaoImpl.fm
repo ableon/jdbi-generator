@@ -1,0 +1,240 @@
+package ${CrudDaoPackage};
+
+import java.util.Map;
+import java.util.List;
+import java.util.LinkedHashMap;
+import javax.annotation.PostConstruct;
+<#list importList as import>
+import ${import};
+</#list>
+import ${AbstractDaoPackage}.AbstractCrudDao;
+import ${AbstractDaoPackage}.JdbiCrudDao;
+import ${AbstractDaoPackage}.encoder.Encoder;
+import ${EntitiesPackage}.${Entity};
+import ${ConfigPackage}.${DataSourceClassName}DataSourceConfig;
+import ${ConfigPackage}.${DataSourceClassName}JdbiConfig;
+import org.jdbi.v3.core.Jdbi;
+<#if spring>
+import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+</#if>
+
+
+<#if log>${LogAnnotation}</#if>
+<#if spring>@Repository(${DataSourceClassName}DataSourceConfig.NAME + ".${ClassName}CrudDao")</#if>
+public class ${ClassName}CrudDaoImpl extends AbstractCrudDao<${Entity}, ${Key}, ${GeneratedKey}> implements ${ClassName}CrudDao
+{
+    <#if spring>@Autowired @Qualifier(${DataSourceClassName}JdbiConfig.JDBI)</#if>
+    private Jdbi jdbi;
+
+    <#if spring>@Autowired @Qualifier(${DataSourceClassName}JdbiConfig.ENCODER)</#if>
+    private Encoder encoder;
+
+    private JdbiCrudDao<${Entity}, ${Key}, ${GeneratedKey}> jdbiCrudDao;
+
+
+    public ${ClassName}CrudDaoImpl()
+    {
+        super();
+    }
+
+
+    @PostConstruct
+    public void init()
+    {
+        jdbiCrudDao = jdbi.onDemand( ${ClassName}JdbiCrudDao.class );
+    }
+
+
+    @Override
+    public JdbiCrudDao<${Entity}, ${Key}, ${GeneratedKey}> getJdbiCrudDao()
+    {
+        return jdbiCrudDao;
+    }
+
+
+    @Override
+    public void encode(${Entity} entity)
+    {
+        if (entity == null)
+            return;
+
+        <#list fieldDataList as fieldData>
+        <#if fieldData.encrypted>
+        entity.${fieldData.setter}( encoder.encode( entity.${fieldData.getter}() ) );
+        </#if>
+        </#list>
+    }
+
+
+    @Override
+    public void decode(${Entity} entity)
+    {
+        if (entity == null)
+            return;
+
+        <#list fieldDataList as fieldData>
+        <#if fieldData.encrypted>
+        entity.${fieldData.setter}( encoder.decode( entity.${fieldData.getter}() ) );
+        </#if>
+        </#list>
+    }
+
+
+    @Override
+    protected String getQuoteId()
+    {
+        return QUOTE_ID;
+    }
+
+
+    @Override
+    protected String getTableName()
+    {
+        return ${Entity}.TABLE_NAME;
+    }
+
+
+    @Override
+    protected List<String> getColumnsName()
+    {
+        return ${Entity}.ColumnsName;
+    }
+
+
+    @Override
+    protected List<String> getKeyColumnsName()
+    {
+        return ${Entity}.KeyColumnsName;
+    }
+
+
+    @Override
+    protected List<String> getGeneratedKeyColumnNames()
+    {
+        return ${Entity}.GeneratedKeyColumnNames;
+    }
+
+
+    @Override
+    protected void setGeneratedKey(${Entity} entity, ${GeneratedKey} generatedKey)
+    {
+        <#if isGeneratedKey>
+        if (entity == null || generatedKey == null)
+            return;
+
+        <#if isMultipleGeneratedKey>
+        <#list generatedKeyDataList as generatedKeyData>
+        entity.${generatedKeyData.setter}( generatedKey.${generatedKeyData.getter}() );
+        </#list>
+        <#else>
+        <#list generatedKeyDataList as generatedKeyData>
+        entity.${generatedKeyData.setter}( generatedKey );
+        </#list>
+        </#if>
+        </#if>
+    }
+
+
+    @Override
+    protected Map<String, Object> getKeyColumnsMap(${Key} key, Map<String, Object> data)
+    {
+        if (key == null)
+            return EMPTY_MAP;
+
+        Map<String, Object> cols = new LinkedHashMap<>();
+
+        <#if isMultipleKey>
+        <#list pkFieldDataList as pkFieldData>
+        cols.put(${Entity}.${pkFieldData.column}_COLUMN, ${pkFieldData.column}_PROPERTY);
+        data.put(${pkFieldData.column}_PROPERTY, key.${pkFieldData.getter}());
+
+        </#list>
+        <#else>
+        <#list pkFieldDataList as pkFieldData>
+        cols.put(${Entity}.${pkFieldData.column}_COLUMN, ${pkFieldData.column}_PROPERTY);
+        data.put(${pkFieldData.column}_PROPERTY, key);
+
+        </#list>
+        </#if>
+        return cols;
+    }
+
+
+    @Override
+    protected Map<String, Object> getEntityKeyColumnsMap(${Entity} entity, Map<String, Object> data)
+    {
+        if (entity == null)
+            return EMPTY_MAP;
+
+        Map<String, Object> cols = new LinkedHashMap<>();
+
+        <#list pkFieldDataList as pkFieldData>
+        cols.put(${Entity}.${pkFieldData.column}_COLUMN, ${pkFieldData.column}_PROPERTY);
+        data.put(${pkFieldData.column}_PROPERTY, entity.${pkFieldData.getter}());
+
+        </#list>
+        return cols;
+    }
+
+
+    @Override
+    protected Map<String, Object> getFilterColumnsMap(${Entity} filter, Map<String, Object> data)
+    {
+        if (filter == null)
+            return EMPTY_MAP;
+
+        Map<String, Object> cols = new LinkedHashMap<>();
+
+        <#list fieldDataList as fieldData>
+        if (filter.${fieldData.getter}() != null)
+        {
+            cols.put(${Entity}.${fieldData.column}_COLUMN, ${fieldData.column}_PROPERTY);
+            <#if fieldData.encrypted>
+            data.put(${fieldData.column}_PROPERTY, encoder.encode(filter.${fieldData.getter}())); // encrypted
+            <#else>
+            data.put(${fieldData.column}_PROPERTY, filter.${fieldData.getter}());
+            </#if>
+        }
+
+        </#list>
+        return cols;
+    }
+
+
+    @Override
+    protected Map<String, Object> getEntityColumnsMap(${Entity} entity, boolean removeNulls, Map<String, Object> data)
+    {
+        if (entity == null)
+            return EMPTY_MAP;
+
+        Map<String, Object> cols = new LinkedHashMap<>();
+
+        <#list fieldDataList as fieldData>
+        if (!removeNulls || entity.${fieldData.getter}() != null)
+        {
+            <#if fieldData.jsonType??>
+            cols.put(${Entity}.${fieldData.column}_COLUMN, ${fieldData.column}_PROPERTY + "${fieldData.jsonType}");
+            <#else>
+            cols.put(${Entity}.${fieldData.column}_COLUMN, ${fieldData.column}_PROPERTY);
+            </#if>
+            <#if fieldData.encrypted>
+            data.put(${fieldData.column}_PROPERTY, encoder.encode(entity.${fieldData.getter}())); // encrypted
+            <#else>
+            data.put(${fieldData.column}_PROPERTY, entity.${fieldData.getter}());
+            </#if>
+        }
+
+        </#list>
+        return cols;
+    }
+
+    protected static final String QUOTE_ID = "${quoteId}";
+
+    <#list fieldDataList as fieldData>
+    protected static final String ${fieldData.column}_PROPERTY = "${fieldData.property}";
+    </#list>
+
+}
+

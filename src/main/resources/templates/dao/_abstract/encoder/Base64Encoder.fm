@@ -1,0 +1,59 @@
+package ${EncoderDaoPackage};
+
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
+
+public class Base64Encoder implements Encoder
+{
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
+
+
+    public Base64Encoder() {}
+
+
+    @Override
+    public String encode(String value)
+    {
+        try
+        {
+            return Base64.getUrlEncoder().withoutPadding().encodeToString( value.getBytes(CHARSET) );
+        }
+        catch (Exception e)
+        {
+            return value;
+        }
+    }
+
+
+    @Override
+    public String decode(String value)
+    {
+        try
+        {
+            return new String(Base64.getUrlDecoder().decode(value), CHARSET);
+        }
+        catch (Exception e)
+        {
+            return value;
+        }
+    }
+
+
+    /*
+    public static void main(String[] args)
+    {
+        Encoder encoder = new XOREncoder();
+
+        String plain   = "test-1234";
+        String encoded = encoder.encode( plain );
+        String decoded = encoder.decode( encoded );
+
+        System.out.println("plain: " + plain);
+        System.out.println("encoded: " + encoded);
+        System.out.println("decoded: " + decoded);
+    }
+    */
+}
+

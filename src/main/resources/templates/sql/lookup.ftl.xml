@@ -1,0 +1,41 @@
+
+
+<statements namespace="LOOKUP">
+
+
+    <statement id="getLookUp">
+    <![CDATA[
+
+        SELECT
+            ${tableName}.${lookup.labelColumn} as LABEL,
+            ${tableName}.${lookup.valueColumn} as VALUE
+        FROM
+            ${tableName}
+        ORDER BY
+            LABEL ASC
+
+    ]]>
+    </statement>
+
+
+    <statement id="getLabel">
+    <![CDATA[
+
+        SELECT
+            ${tableName}.${lookup.labelColumn} as LABEL
+        FROM
+            ${tableName}
+        WHERE
+        <#if filter??>
+            <#list filter as fieldName, fieldValue>
+                ${tableName}.${fieldName} = :filter.${fieldName}
+                <#if fieldName_has_next>AND</#if>
+            </#list>
+        </#if>
+
+    ]]>
+    </statement>
+
+
+</statements>
+

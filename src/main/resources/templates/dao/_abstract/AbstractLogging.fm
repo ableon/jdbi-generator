@@ -1,0 +1,63 @@
+package ${AbstractDaoPackage};
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Array;
+
+
+public abstract class AbstractLogging
+{
+    protected Logger logger = LoggerFactory.getLogger( getClass() );
+
+
+    protected AbstractLogging() {}
+
+
+    public Logger getLogger() { return logger; }
+
+
+    private StringBuilder getParamsBuffer(String methodName, Object... params)
+    {
+        StringBuilder buffer = new StringBuilder( methodName );
+
+        buffer.append("(");
+
+        if (params != null)
+        {
+            for (int i=0; i<params.length; i++)
+            {
+                if (i > 0)
+                    buffer.append(",");
+
+                if (params[i] != null && params[i].getClass() == byte[].class)
+                    buffer.append("ByteArray[").append(Array.getLength(params[i])).append("]");
+                else
+                if (params[i] != null && params[i].getClass() == String.class)
+                    buffer.append('\"').append(params[i]).append('\"');
+                else
+                    buffer.append(params[i]);
+            }
+        }
+
+        buffer.append(")");
+
+        return buffer;
+    }
+
+
+    protected void debug(String methodName, Object... params)
+    {
+        if (logger.isDebugEnabled())
+            logger.debug( getParamsBuffer(methodName, params).toString() );
+    }
+
+
+    protected void debug(String msg, int value)
+    {
+        if (logger.isDebugEnabled())
+            logger.debug("{}: {}", msg, value);
+    }
+
+}
+

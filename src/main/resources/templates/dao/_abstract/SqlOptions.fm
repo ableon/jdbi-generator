@@ -1,0 +1,548 @@
+package ${AbstractDaoPackage};
+
+import java.util.*;
+
+
+public class SqlOptions
+{
+
+    public static class Sort
+    {
+        private static final String ASC  = "ASC";
+        private static final String DESC = "DESC";
+
+        private final String column;
+        private final String order;
+
+        public Sort()
+        {
+            this(null, null);
+        }
+
+        public Sort(String column, String order)
+        {
+            this.column = column;
+            this.order  = order;
+        }
+
+        public String getColumn()
+        {
+            return column;
+        }
+
+        public String getOrder()
+        {
+            return order;
+        }
+
+        public Map<String, Object> toMap()
+        {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("column", column);
+            map.put("order", order);
+            return map;
+        }
+
+        @Override
+        public String toString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+            sb.append("column=").append(column);
+            sb.append(",order=").append(order);
+            sb.append("}");
+            return sb.toString();
+        }
+    }
+
+
+    public static class In
+    {
+        private final String column;
+        private final List<Object> values;
+
+        public In() { this(null, (List<Object>)null); }
+
+        public In(String column, List<Object> values)
+        {
+            this.column = column;
+            this.values = values;
+        }
+
+        public In(String column, Object... values)
+        {
+            this(column, (values != null) ? Arrays.asList(values) : null);
+        }
+
+        public String getColumn()
+        {
+            return column;
+        }
+
+        public List<Object> getValues()
+        {
+            return values;
+        }
+
+        public Map<String, Object> toMap()
+        {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("column", column);
+            map.put("values", values);
+            return map;
+        }
+
+        @Override
+        public String toString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+            sb.append("column=").append(column);
+            sb.append(",values=").append(values);
+            sb.append("}");
+            return sb.toString();
+        }
+    }
+
+
+    public static class BetweenDates
+    {
+        private final String column;
+        private final Date beginDate;
+        private final Date endDate;
+
+        public BetweenDates() { this(null, null, null); }
+
+        public BetweenDates(String column, Date beginDate, Date endDate)
+        {
+            this.column = column;
+            this.beginDate = beginDate;
+            this.endDate = endDate;
+        }
+
+        public String getColumn()
+        {
+            return column;
+        }
+
+        public Date getBeginDate()
+        {
+            return beginDate;
+        }
+
+        public Date getEndDate()
+        {
+            return endDate;
+        }
+
+        public Map<String, Object> toMap()
+        {
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("column", column);
+            map.put("beginDate", beginDate);
+            map.put("endDate", endDate);
+            return map;
+        }
+
+        @Override
+        public String toString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+            sb.append("column=").append(column);
+            sb.append(",beginDate=").append(beginDate);
+            sb.append(",endDate=").append(endDate);
+            sb.append("}");
+            return sb.toString();
+        }
+    }
+
+
+    public static final Integer MAX_LIMIT = 100;
+
+    private Integer offset;
+    private Integer limit;
+    private List<String> selectColumns;
+    private List<String> nullColumns;
+    private List<In> inColumns;
+    private List<BetweenDates> betweenDates;
+    private List<Sort> sorting;
+
+
+    public SqlOptions() {}
+
+
+    public Integer getOffset()
+    {
+        return offset;
+    }
+
+
+    public void setOffset(Integer offset)
+    {
+        this.offset = (offset != null) ? Math.max(0, offset) : null;
+    }
+
+
+    public Integer getLimit()
+    {
+        return limit;
+    }
+
+
+    public void setLimit(Integer limit)
+    {
+        this.limit = (limit != null) ? Math.max(0, limit) : null;
+    }
+
+
+    public List<String> getSelectColumns()
+    {
+        return selectColumns;
+    }
+
+
+    public void setSelectColumns(List<String> selectColumns)
+    {
+        this.selectColumns = selectColumns;
+    }
+
+
+    public void addSelectColumn(String columnName)
+    {
+        if (columnName == null || columnName.trim().isEmpty())
+            return;
+
+        if (this.selectColumns == null)
+            this.selectColumns = new ArrayList<>();
+
+        this.selectColumns.add( columnName );
+    }
+
+
+    public boolean hasSelectColumns()
+    {
+        return (selectColumns != null && !selectColumns.isEmpty());
+    }
+
+
+    public List<String> getNullColumns()
+    {
+        return nullColumns;
+    }
+
+
+    public void setNullColumns(List<String> nullColumns)
+    {
+        this.nullColumns = nullColumns;
+    }
+
+
+    public void addNullColumn(String nullColumn)
+    {
+        if (nullColumn == null || nullColumn.trim().isEmpty())
+            return;
+
+        if (this.nullColumns == null)
+            this.nullColumns = new ArrayList<>();
+
+        this.nullColumns.add( nullColumn );
+    }
+
+
+    public boolean hasNullColumns()
+    {
+        return (nullColumns != null && !nullColumns.isEmpty());
+    }
+
+
+    public List<In> getInColumns()
+    {
+        return inColumns;
+    }
+
+
+    public void setInColumns(List<In> inColumns)
+    {
+        this.inColumns = inColumns;
+    }
+
+
+    public void addInColumn(In inColumn)
+    {
+        if (inColumn == null)
+            return;
+
+        if (this.inColumns == null)
+            this.inColumns = new ArrayList<>();
+
+        this.inColumns.add( inColumn );
+    }
+
+
+    public boolean hasInColumns()
+    {
+        return (inColumns != null && !inColumns.isEmpty());
+    }
+
+
+    public List<BetweenDates> getBetweenDates()
+    {
+        return betweenDates;
+    }
+
+
+    public void setBetweenDates(List<BetweenDates> betweenDates)
+    {
+        this.betweenDates = betweenDates;
+    }
+
+
+    public void addBetweenDates(BetweenDates betweenDates)
+    {
+        if (betweenDates == null)
+            return;
+
+        if (this.betweenDates == null)
+            this.betweenDates = new ArrayList<>();
+
+        this.betweenDates.add( betweenDates );
+    }
+
+
+    public boolean hasBetweenDates()
+    {
+        return (betweenDates != null && !betweenDates.isEmpty());
+    }
+
+
+    public List<Sort> getSorting()
+    {
+        return sorting;
+    }
+
+
+    public void setSorting(List<Sort> sorting)
+    {
+        this.sorting = sorting;
+    }
+
+
+    public void setSortAscending(String columnName)
+    {
+        if (columnName == null || columnName.trim().isEmpty())
+            return;
+
+        if (this.sorting == null)
+            this.sorting = new ArrayList<>();
+
+        this.sorting.add( new Sort(columnName, Sort.ASC) );
+    }
+
+
+    public void setSortDescending(String columnName)
+    {
+        if (columnName == null || columnName.trim().isEmpty())
+            return;
+
+        if (this.sorting == null)
+            this.sorting = new ArrayList<>();
+
+        this.sorting.add( new Sort(columnName, Sort.DESC) );
+    }
+
+
+    public boolean hasSorting()
+    {
+        return (sorting != null && !sorting.isEmpty());
+    }
+
+
+    public void clearShorting()
+    {
+        if (this.sorting != null)
+            this.sorting.clear();
+
+        this.sorting = null;
+    }
+
+
+    public boolean hasFiltering()
+    {
+        return (hasNullColumns() || hasInColumns() || hasBetweenDates());
+    }
+
+
+    protected void set(Map<String, Object> map, String key, Object value)
+    {
+        if (value != null)
+            map.put(key, value);
+    }
+
+    public Map<String, Object> toMap()
+    {
+        Map<String, Object> map = new LinkedHashMap<>();
+
+        set(map, "offset", offset);
+        set(map, "limit", limit);
+        set(map, "selectColumns", selectColumns);
+        set(map, "nullColumns", nullColumns);
+
+        if (inColumns != null)
+        {
+            final String INS = "ins";
+
+            List<Map<String,Object>> insMapList = new ArrayList<>( inColumns.size() );
+            inColumns.forEach(inColumn -> insMapList.add( inColumn.toMap() ));
+            map.put(INS, insMapList);
+
+            for (int i=0; i<inColumns.size(); i++)
+            {
+                In inColumn = inColumns.get(i);
+
+                for (int v=0; v<inColumn.getValues().size(); v++)
+                    set(map, INS + "_" + i + ".values_" + v, inColumn.getValues().get(v));
+            }
+        }
+
+        if (betweenDates != null)
+        {
+            final String BETWEEN_DATES = "betweenDates";
+
+            List<Map<String,Object>> betweenDatesMapList = new ArrayList<>( betweenDates.size() );
+            betweenDates.forEach(bd -> betweenDatesMapList.add( bd.toMap() ));
+            map.put(BETWEEN_DATES, betweenDatesMapList);
+
+            for (int i=0; i<betweenDates.size(); i++)
+            {
+                BetweenDates bd = betweenDates.get(i);
+                set(map, BETWEEN_DATES + "_" + i + ".column",    bd.getColumn());
+                set(map, BETWEEN_DATES + "_" + i + ".beginDate", bd.getBeginDate());
+                set(map, BETWEEN_DATES + "_" + i + ".endDate",   bd.getEndDate());
+            }
+        }
+
+        if (sorting != null)
+        {
+            List<Map<String,Object>> sortingMapList = new ArrayList<>( sorting.size() );
+            sorting.forEach(sort -> sortingMapList.add( sort.toMap() ));
+            map.put("sorting", sortingMapList);
+        }
+
+        return map;
+    }
+
+
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder(getClass().getSimpleName());
+        sb.append("{");
+        sb.append("offset=").append(offset);
+        sb.append(",limit=").append(limit);
+        sb.append(",selectColumns=").append(selectColumns);
+        sb.append(",nullColumns=").append(nullColumns);
+        sb.append(",inColumns=").append(inColumns);
+        sb.append(",betweenDates=").append(betweenDates);
+        sb.append(",sorting=").append(sorting);
+        sb.append("}");
+        return sb.toString();
+    }
+
+
+    //
+    // Builder
+    //
+
+    public static SqlOptionsBuilder builder()
+    {
+        return new SqlOptionsBuilder();
+    }
+
+    public static class SqlOptionsBuilder
+    {
+        private final SqlOptions sqlOptions;
+
+        public SqlOptionsBuilder()
+        {
+            this.sqlOptions = new SqlOptions();
+        }
+
+        public SqlOptionsBuilder offset(Integer offset)
+        {
+            this.sqlOptions.setOffset(offset);
+            return this;
+        }
+
+        public SqlOptionsBuilder limit(Integer limit)
+        {
+            this.sqlOptions.setLimit(limit);
+            return this;
+        }
+
+        public SqlOptionsBuilder selectColumn(String columnName)
+        {
+            this.sqlOptions.addSelectColumn(columnName);
+            return this;
+        }
+
+        public SqlOptionsBuilder selectColumns(String... columnsName)
+        {
+            if (columnsName != null)
+                for (String columnName : columnsName)
+                    this.sqlOptions.addSelectColumn( columnName );
+
+            return this;
+        }
+
+        public SqlOptionsBuilder selectColumns(List<String> columnsName)
+        {
+            if (columnsName != null)
+                for (String columnName : columnsName)
+                    this.sqlOptions.addSelectColumn( columnName );
+
+            return this;
+        }
+
+        public SqlOptionsBuilder nullColumn(String nullColumn)
+        {
+            this.sqlOptions.addNullColumn(nullColumn);
+            return this;
+        }
+
+        public SqlOptionsBuilder inColumn(String column, Object... values)
+        {
+            if (column != null && !column.trim().isEmpty() && values != null && values.length>0)
+                this.sqlOptions.addInColumn( new In(column, values) );
+
+            return this;
+        }
+
+        public SqlOptionsBuilder betweenDates(String column, Date beginDate, Date endDate)
+        {
+            if (column != null && !column.trim().isEmpty() && (beginDate != null || endDate != null))
+                this.sqlOptions.addBetweenDates( new BetweenDates(column, beginDate, endDate) );
+
+            return this;
+        }
+
+        public SqlOptionsBuilder sortAscending(String columnName)
+        {
+            this.sqlOptions.setSortAscending(columnName);
+            return this;
+        }
+
+        public SqlOptionsBuilder sortDescending(String columnName)
+        {
+            this.sqlOptions.setSortDescending(columnName);
+            return this;
+        }
+
+        public SqlOptions build()
+        {
+            return this.sqlOptions;
+        }
+    }
+
+}
+

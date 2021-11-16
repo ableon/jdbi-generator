@@ -1,0 +1,61 @@
+package ${FreemarkerDaoPackage};
+
+import freemarker.template.Template;
+import org.jdbi.v3.core.config.ConfigRegistry;
+import org.jdbi.v3.core.statement.SqlStatements;
+import org.jdbi.v3.core.statement.TemplateEngine;
+import org.jdbi.v3.freemarker.FreemarkerConfig;
+import org.jdbi.v3.freemarker.internal.UseFreemarkerSqlLocatorImpl;
+import org.jdbi.v3.sqlobject.SqlObjects;
+import org.jdbi.v3.sqlobject.internal.SqlAnnotations;
+import org.jdbi.v3.sqlobject.locator.SqlLocator;
+
+import java.io.StringWriter;
+import java.lang.annotation.Annotation;
+
+
+public class UseSqlLocatorImpl extends UseFreemarkerSqlLocatorImpl
+{
+
+    public UseSqlLocatorImpl()
+    {
+        super();
+    }
+
+
+    @Override
+    public void configureForType(ConfigRegistry registry, Annotation annotation, Class<?> sqlObjectType)
+    {
+        SqlLocator locator = (type, method, config) -> SqlAnnotations.getAnnotationValue(method).orElseGet(method::getName);
+
+        TemplateEngine templateEngine = (templateName, ctx) ->
+        {
+            Template template;
+
+            try
+            {
+                template = ctx.getConfig(FreemarkerConfig.class).getFreemarkerConfiguration().getTemplate(templateName);
+            }
+            catch (Exception e)
+            {
+                throw new IllegalStateException("Failed to get template " + templateName, e);
+            }
+
+            try
+            {
+                StringWriter writer = new StringWriter();
+                template.process(ctx.getAttributes(), writer);
+                return writer.toString();
+            }
+            catch (Exception e)
+            {
+                throw new IllegalStateException("Failed to render template " + templateName, e);
+            }
+        };
+
+        registry.get(SqlObjects.class).setSqlLocator(locator);
+        registry.get(SqlStatements.class).setTemplateEngine(templateEngine);
+    }
+
+}
+

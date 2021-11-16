@@ -1,0 +1,28 @@
+package ${CatalogsPackage};
+
+<#list importList as import>
+import ${import};
+</#list>
+
+public enum ${ClassName}
+{
+    <#list catalogData as catalogCode, catalogValue>
+    ${catalogCode} (${catalogValue})<#if catalogCode_has_next>,<#else>;</#if>
+    </#list>
+
+
+    private final ${pkType} value;
+
+    ${ClassName}(${pkType} value) { this.value = value; }
+
+    public ${pkType} value() { return value; }
+
+
+    public static final class Code
+    {
+        <#list catalogData as catalogCode, catalogValue>
+        public static final String ${catalogCode} = "${catalogCode}";
+        </#list>
+    }
+}
+
