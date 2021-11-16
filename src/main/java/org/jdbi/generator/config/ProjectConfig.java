@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.jdbi.generator.AbstractComponent;
+import org.jdbi.generator.main.AbstractComponent;
 import org.jdbi.generator.validators.CheckPath;
 import org.jdbi.generator.validators.StringValues;
 

@@ -19,6 +19,10 @@ public @interface StringValues
 {
     String message() default "{validation.constraints.StringValues.message}";
 
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
+
     String value();
 
     String separator() default ",";

@@ -31,7 +31,7 @@
         <freemarker.version>2.3.31</freemarker.version>
         <banner.version>0.0.8</banner.version>
         <commons-cli.version>1.5.0</commons-cli.version>
-        <main.class>org.jdbi.dao.generator.Main</main.class>
+        <main.class>org.jdbi.generator.main.Main</main.class>
     </properties>
 
 
@@ -66,6 +66,9 @@
             <scope>test</scope>
         </dependency>
         -->
+
+
+        <!-- Freemarker -->
 
         <!-- https://mvnrepository.com/artifact/org.freemarker/freemarker -->
         <dependency>
@@ -120,6 +123,7 @@
 
 
         <!-- CLI -->
+
         <!-- https://mvnrepository.com/artifact/commons-cli/commons-cli -->
         <dependency>
             <groupId>commons-cli</groupId>
@@ -128,8 +132,8 @@
         </dependency>
 
 
-
         <!-- Test -->
+
         <!-- https://mvnrepository.com/artifact/junit/junit -->
         <dependency>
             <groupId>junit</groupId>

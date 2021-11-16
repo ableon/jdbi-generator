@@ -2,7 +2,7 @@ package org.jdbi.generator.config;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.ConstraintViolation;
-import org.jdbi.generator.AbstractComponent;
+import org.jdbi.generator.main.AbstractComponent;
 
 import java.util.List;
 import java.util.Set;

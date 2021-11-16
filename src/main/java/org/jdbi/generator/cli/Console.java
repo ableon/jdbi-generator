@@ -11,6 +11,7 @@ import java.io.InputStream;
 public class Console
 {
     public static final String lineSeparator = System.lineSeparator();
+    public static final String line = "----------------------------------------" + lineSeparator;
 
     protected static final String BANNER   = "JDBI - Generator";
     protected static final String VERSION  = "1.0.0";

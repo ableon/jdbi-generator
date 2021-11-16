@@ -1,4 +1,4 @@
-package org.jdbi.generator;
+package org.jdbi.generator.main;
 
 import org.jdbi.generator.config.DataSourceConfig;
 import org.jdbi.generator.config.JtaConfig;

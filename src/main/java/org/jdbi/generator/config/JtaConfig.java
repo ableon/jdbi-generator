@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.constraints.NotNull;
-import org.jdbi.generator.AbstractComponent;
+import org.jdbi.generator.main.AbstractComponent;
 import org.jdbi.generator.cli.Console;
 
 import java.util.Map;

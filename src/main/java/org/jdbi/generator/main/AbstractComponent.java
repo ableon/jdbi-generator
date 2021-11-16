@@ -1,4 +1,4 @@
-package org.jdbi.generator;
+package org.jdbi.generator.main;
 
 import jakarta.validation.ConstraintViolation;
 import org.jdbi.generator.validators.Validator;

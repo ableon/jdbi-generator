@@ -18,5 +18,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface CheckVarName
 {
     String message() default "{validation.constraints.VarName.message}";
+
+    Class<?>[] groups() default { };
+
+    Class<? extends Payload>[] payload() default { };
+
 }
 

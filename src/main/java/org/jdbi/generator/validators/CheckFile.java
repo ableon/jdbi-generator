@@ -15,6 +15,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Constraint(validatedBy = CheckFileValidator.class)
 @Documented
+//@Repeatable(CheckFile.List.class)
 public @interface CheckFile
 {
     String message() default "{validation.constraints.File.message}";

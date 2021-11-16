@@ -1,4 +1,4 @@
-package org.jdbi.generator;
+package org.jdbi.generator.main;
 
 import org.jdbi.generator.cli.Console;
 import org.jdbi.generator.config.Config;
@@ -40,10 +40,9 @@ public class Generator extends AbstractComponent
         // validate config file
         Validator.getInstance().validate( config );
 
-        Console.verbose("---" +
-                        Console.lineSeparator +
-                        "Config:" +
-                        Console.lineSeparator +
+        Console.verbose(Console.line +
+                        "Config:" + Console.lineSeparator +
+                        Console.line +
                         Mapper.getInstance().toYaml(config), true);
 
         // explore database

@@ -1,7 +1,7 @@
 package org.jdbi.generator.explorer;
 
 import jakarta.validation.ValidationException;
-import org.jdbi.generator.AbstractComponent;
+import org.jdbi.generator.main.AbstractComponent;
 import org.jdbi.generator.cli.Console;
 import org.jdbi.generator.config.Config;
 import org.jdbi.generator.config.DataSourceConfig;
@@ -208,10 +208,9 @@ public class Explorer extends AbstractComponent implements AbstractResultSet
             // verbose
             for (DBTable dbTable : tables)
             {
-                Console.verbose("---" +
-                                Console.lineSeparator +
-                                "Table " + dbTable.getName() + ":" +
-                                Console.lineSeparator +
+                Console.verbose(Console.line +
+                                "Table " + dbTable.getName() + ":" + Console.lineSeparator +
+                                Console.line +
                                 Mapper.getInstance().toYaml(dbTable), true);
             }
 

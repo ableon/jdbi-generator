@@ -1,6 +1,6 @@
 package org.jdbi.generator.templates;
 
-import org.jdbi.generator.Workspace;
+import org.jdbi.generator.main.Workspace;
 import org.jdbi.generator.explorer.DBTable;
 
 import java.util.HashMap;

@@ -1,6 +1,8 @@
 package org.jdbi.generator.explorer;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class DBColumn
 {
     private String name;
@@ -83,16 +85,6 @@ public class DBColumn
     public void setSqlTypeName(String sqlTypeName)
     {
         this.sqlTypeName = sqlTypeName;
-    }
-
-    public boolean isJson()
-    {
-        return "json".equalsIgnoreCase(sqlTypeName);
-    }
-
-    public boolean isJsonB()
-    {
-        return "jsonb".equalsIgnoreCase(sqlTypeName);
     }
 
     public int getPrecision()
@@ -213,6 +205,18 @@ public class DBColumn
     public void setQuoted(boolean quoted)
     {
         this.quoted = quoted;
+    }
+
+    @JsonIgnore
+    public boolean isJson()
+    {
+        return "json".equalsIgnoreCase(sqlTypeName);
+    }
+
+    @JsonIgnore
+    public boolean isJsonB()
+    {
+        return "jsonb".equalsIgnoreCase(sqlTypeName);
     }
 
 }

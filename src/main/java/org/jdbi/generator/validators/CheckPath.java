@@ -18,5 +18,10 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface CheckPath
 {
     String message() default "{validation.constraints.Path.message}";
+
+    Class<?>[] groups() default { };
+
+    Class<? extends Payload>[] payload() default { };
+
 }
 

@@ -7,7 +7,7 @@ import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.hibernate.validator.resourceloading.AggregateResourceBundleLocator;
 import org.hibernate.validator.spi.resourceloading.ResourceBundleLocator;
-import org.jdbi.generator.AbstractComponent;
+import org.jdbi.generator.main.AbstractComponent;
 import org.jdbi.generator.cli.Console;
 import org.jdbi.generator.config.Config;
 

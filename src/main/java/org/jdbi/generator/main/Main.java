@@ -1,4 +1,4 @@
-package org.jdbi.generator;
+package org.jdbi.generator.main;
 
 import jakarta.validation.ValidationException;
 import org.jdbi.generator.cli.CLI;
