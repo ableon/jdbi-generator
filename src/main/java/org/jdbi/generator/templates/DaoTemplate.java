@@ -12,20 +12,21 @@ public class DaoTemplate extends AbstractTemplate
 {
     private static final String[] SOURCE =
     {
-        "templates/dao/_abstract/encoder/Encoder.fm",
-        "templates/dao/_abstract/encoder/XOREncoder.fm",
-        "templates/dao/_abstract/encoder/Base64Encoder.fm",
-        "templates/dao/_abstract/freemarker/SqlTemplateLoader.fm",
-        "templates/dao/_abstract/freemarker/UseSqlLocator.fm",
-        "templates/dao/_abstract/freemarker/UseSqlLocatorImpl.fm",
-        "templates/dao/_abstract/multitenant/MultiTenantContext.fm",
-        "templates/dao/_abstract/multitenant/MultiTenantSqlObjectPlugin.fm",
-        "templates/dao/_abstract/pagination/Page.fm",
-        "templates/dao/_abstract/AbstractCrudDao.fm",
-        "templates/dao/_abstract/AbstractLogging.fm",
-        "templates/dao/_abstract/CrudDao.fm",
-        "templates/dao/_abstract/JdbiCrudDao.fm",
-        "templates/dao/_abstract/SqlOptions.fm",
+        "templates/dao/_base/encoder/Encoder.fm",
+        "templates/dao/_base/encoder/XOREncoder.fm",
+        "templates/dao/_base/encoder/Base64Encoder.fm",
+        "templates/dao/_base/freemarker/SqlTemplateLoader.fm",
+        "templates/dao/_base/freemarker/UseSqlLocator.fm",
+        "templates/dao/_base/freemarker/UseSqlLocatorImpl.fm",
+        "templates/dao/_base/multitenant/TenantInfo.fm",
+        "templates/dao/_base/multitenant/MultiTenantContext.fm",
+        "templates/dao/_base/multitenant/MultiTenantSqlObjectPlugin.fm",
+        "templates/dao/_base/pagination/Page.fm",
+        "templates/dao/_base/AbstractCrudDao.fm",
+        "templates/dao/_base/AbstractLogging.fm",
+        "templates/dao/_base/CrudDao.fm",
+        "templates/dao/_base/JdbiCrudDao.fm",
+        "templates/dao/_base/SqlOptions.fm",
     };
 
     private static final String[] TARGET =
@@ -36,6 +37,7 @@ public class DaoTemplate extends AbstractTemplate
         "freemarker/SqlTemplateLoader.java",
         "freemarker/UseSqlLocator.java",
         "freemarker/UseSqlLocatorImpl.java",
+        "multitenant/TenantInfo.java",
         "multitenant/MultiTenantContext.java",
         "multitenant/MultiTenantSqlObjectPlugin.java",
         "pagination/Page.java",
@@ -44,24 +46,6 @@ public class DaoTemplate extends AbstractTemplate
         "CrudDao.java",
         "JdbiCrudDao.java",
         "SqlOptions.java",
-
-        /*
-        "AbstractCrudDao.java",
-        "AbstractDao.java",
-        "AbstractLogging.java",
-        "AbstractLookUpDao.java",
-        //"AbstractResultSet.java",
-        "Base64Encoder.java",
-        "XOREncoder.java",
-        "DefaultSqlLoader.java",
-        "Encoder.java",
-        "ICrudDao.java",
-        "ILookUpDao.java",
-        "LookUpDto.java",
-        "OptionsCrudDto.java",
-        "ParamsCrudDto.java",
-        "SqlLoader.java",
-        */
     };
 
 
@@ -81,7 +65,7 @@ public class DaoTemplate extends AbstractTemplate
     @Override
     public String getTarget(int index, DBTable dbTable)
     {
-        return getWorkspace().getAbstractDaoDir() + TARGET[index];
+        return getWorkspace().getBaseDaoDir() + TARGET[index];
     }
 
 
@@ -96,7 +80,7 @@ public class DaoTemplate extends AbstractTemplate
     {
         Map<String, Object> map = new HashMap<>();
 
-        map.put("AbstractDaoPackage", getWorkspace().getAbstractDaoPackage());
+        map.put("BaseDaoPackage", getWorkspace().getBaseDaoPackage());
         map.put("EncoderDaoPackage", getWorkspace().getEncoderDaoPackage());
         map.put("FreemarkerDaoPackage", getWorkspace().getFreemarkerDaoPackage());
         map.put("MultiTenantDaoPackage", getWorkspace().getMultiTenantDaoPackage());

@@ -1,4 +1,4 @@
-package ${AbstractDaoPackage};
+package ${BaseDaoPackage};
 
 import java.util.*;
 

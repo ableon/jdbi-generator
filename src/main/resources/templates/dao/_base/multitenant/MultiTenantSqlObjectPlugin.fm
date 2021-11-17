@@ -30,9 +30,16 @@ public class MultiTenantSqlObjectPlugin extends SqlObjectPlugin
     }
 
 
-    public String getSchema()
+    private String getSchema()
     {
-        return MultiTenantContext.getSchema();
+        try
+        {
+            return MultiTenantContext.getTenantInfo().getSchema();
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
 }

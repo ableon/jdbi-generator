@@ -12,18 +12,18 @@ public class TestDaoTemplate extends AbstractTemplate
 {
     private static final String[] SOURCE =
     {
-        "templates/testing/dao/_abstract/AbstractDaoTest.fm",
-        "templates/testing/dao/_abstract/DataTestFactory.fm",
-        "templates/testing/dao/_abstract/constraints/AbstractConstraints.fm",
-        "templates/testing/dao/_abstract/constraints/DB2Constraints.fm",
-        "templates/testing/dao/_abstract/constraints/H2Constraints.fm",
-        "templates/testing/dao/_abstract/constraints/HSQLDBConstraints.fm",
-        "templates/testing/dao/_abstract/constraints/MariaDBConstraints.fm",
-        "templates/testing/dao/_abstract/constraints/MySQLConstraints.fm",
-        "templates/testing/dao/_abstract/constraints/OracleConstraints.fm",
-        "templates/testing/dao/_abstract/constraints/PostgreSQLConstraints.fm",
-        "templates/testing/dao/_abstract/constraints/SQLiteConstraints.fm",
-        "templates/testing/dao/_abstract/constraints/SQLServerConstraints.fm",
+        "templates/testing/dao/_base/AbstractDaoTest.fm",
+        "templates/testing/dao/_base/DataTestFactory.fm",
+        "templates/testing/dao/_base/constraints/AbstractConstraints.fm",
+        "templates/testing/dao/_base/constraints/DB2Constraints.fm",
+        "templates/testing/dao/_base/constraints/H2Constraints.fm",
+        "templates/testing/dao/_base/constraints/HSQLDBConstraints.fm",
+        "templates/testing/dao/_base/constraints/MariaDBConstraints.fm",
+        "templates/testing/dao/_base/constraints/MySQLConstraints.fm",
+        "templates/testing/dao/_base/constraints/OracleConstraints.fm",
+        "templates/testing/dao/_base/constraints/PostgreSQLConstraints.fm",
+        "templates/testing/dao/_base/constraints/SQLiteConstraints.fm",
+        "templates/testing/dao/_base/constraints/SQLServerConstraints.fm",
     };
 
     private static final String[] TARGET =
@@ -65,7 +65,7 @@ public class TestDaoTemplate extends AbstractTemplate
         }
         else
         {
-            return getWorkspace().getTestAbstractDaoDir() + TARGET[index];
+            return getWorkspace().getTestBaseDaoDir() + TARGET[index];
         }
     }
 
@@ -81,7 +81,7 @@ public class TestDaoTemplate extends AbstractTemplate
     {
         Map<String, Object> map = new HashMap<>();
 
-        map.put("TestAbstractDaoPackage", getWorkspace().getTestAbstractDaoPackage());
+        map.put("TestBaseDaoPackage", getWorkspace().getTestBaseDaoPackage());
         map.put("TestConstraintsDaoPackage", getWorkspace().getTestConstraintsDaoPackage());
         map.put("MainPackage", getWorkspace().getMainPackage());
         map.put("spring", getWorkspace().isSpring());

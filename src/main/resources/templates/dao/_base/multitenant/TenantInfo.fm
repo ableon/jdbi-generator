@@ -1,0 +1,44 @@
+package ${MultiTenantDaoPackage};
+
+
+public class TenantInfo
+{
+    private String id;
+    private String schema;
+
+
+    public TenantInfo() {}
+
+
+    public TenantInfo(String id, String schema)
+    {
+        this.id = id;
+        this.schema = schema;
+    }
+
+
+    public String getId()
+    {
+        return id;
+    }
+
+
+    public void setId(String id )
+    {
+        this.id = id;
+    }
+
+
+    public String getSchema()
+    {
+        return schema;
+    }
+
+
+    public void setSchema(String schema)
+    {
+        this.schema = schema;
+    }
+
+}
+

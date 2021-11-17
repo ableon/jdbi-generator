@@ -7,9 +7,9 @@ import javax.annotation.PostConstruct;
 <#list importList as import>
 import ${import};
 </#list>
-import ${AbstractDaoPackage}.AbstractCrudDao;
-import ${AbstractDaoPackage}.JdbiCrudDao;
-import ${AbstractDaoPackage}.encoder.Encoder;
+import ${BaseDaoPackage}.AbstractCrudDao;
+import ${BaseDaoPackage}.JdbiCrudDao;
+import ${BaseDaoPackage}.encoder.Encoder;
 import ${EntitiesPackage}.${Entity};
 import ${ConfigPackage}.${DataSourceClassName}DataSourceConfig;
 import ${ConfigPackage}.${DataSourceClassName}JdbiConfig;

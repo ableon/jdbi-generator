@@ -1,4 +1,4 @@
-package ${AbstractDaoPackage};
+package ${BaseDaoPackage};
 
 import java.sql.SQLException;
 import java.util.List;

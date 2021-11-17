@@ -1,8 +1,8 @@
 package ${ConfigPackage};
 
-import ${AbstractDaoPackage}.encoder.Encoder;
-import ${AbstractDaoPackage}.encoder.XOREncoder;
-import ${AbstractDaoPackage}.freemarker.SqlTemplateLoader;
+import ${BaseDaoPackage}.encoder.Encoder;
+import ${BaseDaoPackage}.encoder.XOREncoder;
+import ${BaseDaoPackage}.freemarker.SqlTemplateLoader;
 import freemarker.cache.TemplateLoader;
 import org.jdbi.v3.core.Handles;
 import org.jdbi.v3.core.Jdbi;
@@ -53,7 +53,7 @@ import java.util.List;
     <dependency>
         <groupId>org.jdbi</groupId>
         <artifactId>jdbi3-sqlobject</artifactId>
-        <version>${jdbi3.version}</version>
+        <version>${"$"}{jdbi3.version}</version>
     </dependency>
 */
 

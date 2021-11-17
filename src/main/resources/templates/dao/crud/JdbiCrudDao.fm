@@ -1,7 +1,7 @@
 package ${CrudDaoPackage};
 
-import ${AbstractDaoPackage}.JdbiCrudDao;
-import ${AbstractDaoPackage}.freemarker.UseSqlLocator;
+import ${BaseDaoPackage}.JdbiCrudDao;
+import ${BaseDaoPackage}.freemarker.UseSqlLocator;
 import ${EntitiesPackage}.${Entity};
 import org.jdbi.v3.sqlobject.config.RegisterBeanMapper;
 import org.jdbi.v3.sqlobject.config.RegisterBeanMappers;

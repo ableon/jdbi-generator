@@ -21,7 +21,7 @@ public class Workspace
     public static final String JAVA         = "java";
     public static final String RESOURCES    = "resources";
     public static final String DATA_SOURCES = "datasources";
-    public static final String ABSTRACT     = "_abstract";
+    public static final String BASE         = "_base";
     public static final String CONSTRAINTS  = "constraints";
     public static final String MODEL        = "model";
     public static final String DAO          = "dao";
@@ -356,29 +356,29 @@ public class Workspace
         return getDaoDir() + toJavaPath( dataSourceName.toLowerCase() );
     }
 
-    public String getAbstractDaoDir()
+    public String getBaseDaoDir()
     {
-        return getDaoDir() + toJavaPath( ABSTRACT );
+        return getDaoDir() + toJavaPath(BASE);
     }
 
     public String getEncoderDaoDir()
     {
-        return getAbstractDaoDir() + toJavaPath( "encoder" );
+        return getBaseDaoDir() + toJavaPath( "encoder" );
     }
 
     public String getFreemarkerDaoDir()
     {
-        return getAbstractDaoDir() + toJavaPath( "freemarker" );
+        return getBaseDaoDir() + toJavaPath( "freemarker" );
     }
 
     public String getMultiTenantDaoDir()
     {
-        return getAbstractDaoDir() + toJavaPath( "multitenant" );
+        return getBaseDaoDir() + toJavaPath( "multitenant" );
     }
 
     public String getPaginationDaoDir()
     {
-        return getAbstractDaoDir() + toJavaPath( "pagination" );
+        return getBaseDaoDir() + toJavaPath( "pagination" );
     }
 
     public String getCrudDaoDir()
@@ -396,14 +396,14 @@ public class Workspace
         return getTestJavaDir() + getTestPackagePath() + toJavaPath( DAO );
     }
 
-    public String getTestAbstractDaoDir()
+    public String getTestBaseDaoDir()
     {
-        return getTestDaoDir() + toJavaPath( ABSTRACT );
+        return getTestDaoDir() + toJavaPath(BASE);
     }
 
     public String getTestConstraintsDaoDir()
     {
-        return getTestAbstractDaoDir() + toJavaPath( CONSTRAINTS );
+        return getTestBaseDaoDir() + toJavaPath( CONSTRAINTS );
     }
 
     public String getDataSourceTestDaoDir()
@@ -473,9 +473,9 @@ public class Workspace
         return getPackage( getCatalogsDir() );
     }
 
-    public String getAbstractDaoPackage()
+    public String getBaseDaoPackage()
     {
-        return getPackage( getAbstractDaoDir() );
+        return getPackage( getBaseDaoDir() );
     }
 
     public String getEncoderDaoPackage()
@@ -503,9 +503,9 @@ public class Workspace
         return getPackage( getCrudDaoDir() );
     }
 
-    public String getTestAbstractDaoPackage()
+    public String getTestBaseDaoPackage()
     {
-        return getPackage( getTestAbstractDaoDir() );
+        return getPackage( getTestBaseDaoDir() );
     }
 
     public String getTestConstraintsDaoPackage()
@@ -537,7 +537,7 @@ public class Workspace
         createDir( getCatalogsDir() );
 
         // dao
-        createDir( getAbstractDaoDir() );
+        createDir( getBaseDaoDir() );
         createDir( getEncoderDaoDir() );
         createDir( getFreemarkerDaoDir() );
         createDir( getMultiTenantDaoDir() );
@@ -546,7 +546,7 @@ public class Workspace
         createDir( getLookupDaoDir() );
 
         // test
-        createDir( getTestAbstractDaoDir() );
+        createDir( getTestBaseDaoDir() );
         createDir( getTestConstraintsDaoDir() );
         createDir( getTestCrudDaoDir() );
         createDir( getTestLookupDaoDir() );

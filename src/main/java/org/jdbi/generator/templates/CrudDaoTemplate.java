@@ -114,7 +114,7 @@ public class CrudDaoTemplate extends AbstractTemplate
         }
 
         map.put("CrudDaoPackage", getWorkspace().getCrudDaoPackage());
-        map.put("AbstractDaoPackage", getWorkspace().getAbstractDaoPackage());
+        map.put("BaseDaoPackage", getWorkspace().getBaseDaoPackage());
         map.put("EntitiesPackage", getWorkspace().getEntitiesPackage());
         map.put("ConfigPackage", getWorkspace().getConfigPackage());
         map.put("ClassName", className);

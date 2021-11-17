@@ -91,7 +91,7 @@ public class ConfigTemplate extends AbstractTemplate
         String objectName     = Strings.toPropertyName( dataSourceName );
 
         map.put("ConfigPackage", getWorkspace().getConfigPackage());
-        map.put("AbstractDaoPackage", getWorkspace().getAbstractDaoPackage());
+        map.put("BaseDaoPackage", getWorkspace().getBaseDaoPackage());
         map.put("datasources", Workspace.DATA_SOURCES);
         map.put("type", getType());
         map.put("DataSourceName", dataSourceName);

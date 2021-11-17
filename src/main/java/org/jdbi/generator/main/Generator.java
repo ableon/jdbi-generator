@@ -105,7 +105,7 @@ public class Generator extends AbstractComponent
 
         if (super.bool(generatorConfig.getGenerateCrudDaos()))
         {
-            Console.verbose("Generating Abstract Dao...");
+            Console.verbose("Generating Base Dao...");
             DaoTemplate daoTemplate = new DaoTemplate(workspace, explorer.getTables());
             daoTemplate.generate();
 

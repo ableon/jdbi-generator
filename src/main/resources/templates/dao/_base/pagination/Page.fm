@@ -1,6 +1,6 @@
 package ${PaginationDaoPackage};
 
-import ${AbstractDaoPackage}.SqlOptions;
+import ${BaseDaoPackage}.SqlOptions;
 
 import java.util.List;
 

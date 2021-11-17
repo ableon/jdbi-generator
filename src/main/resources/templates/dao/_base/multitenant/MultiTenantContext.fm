@@ -1,0 +1,30 @@
+package ${MultiTenantDaoPackage};
+
+
+public class MultiTenantContext
+{
+    private static final ThreadLocal<TenantInfo> context = new InheritableThreadLocal<>();
+
+
+    private MultiTenantContext() {}
+
+
+    public static TenantInfo getTenantInfo()
+    {
+        return context.get();
+    }
+
+
+    public static void setTenantInfo(TenantInfo tenantInfo)
+    {
+        context.set( tenantInfo );
+    }
+
+
+    public static void clearTenantInfo()
+    {
+        context.remove();
+    }
+
+}
+
