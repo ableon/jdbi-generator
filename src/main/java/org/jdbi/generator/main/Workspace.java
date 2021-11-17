@@ -29,6 +29,7 @@ public class Workspace
     public static final String CATALOGS     = "catalogs";
     public static final String CRUD         = "crud";
     public static final String LOOKUP       = "lookup";
+    public static final String CUSTOM       = "custom";
 
     private Boolean jta;
     private String datasourceClassName;
@@ -341,6 +342,11 @@ public class Workspace
         return getModelDir() + toJavaPath( LOOKUP );
     }
 
+    public String getCustomDir()
+    {
+        return getModelDir() + toJavaPath( CUSTOM );
+    }
+
     public String getCatalogsDir()
     {
         return getModelDir() + toJavaPath( CATALOGS );
@@ -386,9 +392,14 @@ public class Workspace
         return getDataSourceDaoDir() + toJavaPath( CRUD );
     }
 
-    public String getLookupDaoDir()
+    public String getLookUpDaoDir()
     {
         return getDataSourceDaoDir() + toJavaPath( LOOKUP );
+    }
+
+    public String getCustomDaoDir()
+    {
+        return getDataSourceDaoDir() + toJavaPath( CUSTOM );
     }
 
     public String getTestDaoDir()
@@ -416,9 +427,14 @@ public class Workspace
         return getDataSourceTestDaoDir() + toJavaPath( CRUD );
     }
 
-    public String getTestLookupDaoDir()
+    public String getTestLookUpDaoDir()
     {
         return getDataSourceTestDaoDir() + toJavaPath( LOOKUP );
+    }
+
+    public String getTestCustomDaoDir()
+    {
+        return getDataSourceTestDaoDir() + toJavaPath( CUSTOM );
     }
 
     public String getDataSourcesResourcesDir()
@@ -468,6 +484,11 @@ public class Workspace
         return getPackage( getLookUpDir() );
     }
 
+    public String getCustomPackage()
+    {
+        return getPackage( getCustomDir() );
+    }
+
     public String getCatalogsPackage()
     {
         return getPackage( getCatalogsDir() );
@@ -503,6 +524,16 @@ public class Workspace
         return getPackage( getCrudDaoDir() );
     }
 
+    public String getLookUpDaoPackage()
+    {
+        return getPackage( getLookUpDaoDir() );
+    }
+
+    public String getCustomDaoPackage()
+    {
+        return getPackage( getCustomDaoDir() );
+    }
+
     public String getTestBaseDaoPackage()
     {
         return getPackage( getTestBaseDaoDir() );
@@ -516,6 +547,16 @@ public class Workspace
     public String getTestCrudDaoPackage()
     {
         return getPackage( getTestCrudDaoDir() );
+    }
+
+    public String getTestLookUpDaoPackage()
+    {
+        return getPackage( getTestLookUpDaoDir() );
+    }
+
+    public String getTestCustomDaoPackage()
+    {
+        return getPackage( getTestCustomDaoDir() );
     }
 
 
@@ -543,13 +584,15 @@ public class Workspace
         createDir( getMultiTenantDaoDir() );
         createDir( getPaginationDaoDir() );
         createDir( getCrudDaoDir() );
-        createDir( getLookupDaoDir() );
+        createDir( getLookUpDaoDir() );
+        createDir( getCustomDaoDir() );
 
         // test
         createDir( getTestBaseDaoDir() );
         createDir( getTestConstraintsDaoDir() );
         createDir( getTestCrudDaoDir() );
-        createDir( getTestLookupDaoDir() );
+        createDir( getTestLookUpDaoDir() );
+        createDir( getTestCustomDaoDir() );
 
         // resources
         createDir( getDataSourcesResourcesDir() );

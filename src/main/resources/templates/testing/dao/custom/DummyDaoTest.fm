@@ -1,0 +1,60 @@
+package ${TestCustomDaoPackage};
+
+import javax.sql.DataSource;
+import java.util.List;
+import ${ConfigPackage}.${DataSourceClassName}DataSourceConfig;
+import ${BaseDaoPackage}.SqlOptions;
+import ${EntitiesPackage}.${Entity};
+import ${TestBaseDaoPackage}.AbstractDaoTest;
+import ${CustomDaoPackage}.DummyDao;
+import org.junit.jupiter.api.Test;
+<#if spring>
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
+</#if>
+
+
+<#if spring>
+@Transactional<#if !jta>(transactionManager = ${DataSourceClassName}DataSourceConfig.TRANSACTION_MANAGER)</#if>
+@Rollback(true)
+</#if>
+public class DummyDaoTest extends AbstractDaoTest
+{
+    <#if spring>@Autowired @Qualifier(${DataSourceClassName}DataSourceConfig.DATASOURCE)</#if>
+    private DataSource dataSource;
+
+    <#if spring>@Autowired</#if>
+    private DummyDao dummyDao;
+
+
+    public DummyDaoTest()
+    {
+        super();
+        super.disableConstraints();
+    }
+
+
+    @Override
+    protected DataSource getDataSource()
+    {
+        return dataSource;
+    }
+
+
+    @Test
+    public void selectOne() throws Exception
+    {
+        logger.info("selectOne");
+
+        String tableName = ${Entity}.TABLE_NAME;
+        SqlOptions sqlOptions = SqlOptions.builder().offset(0).limit(5).build();
+
+        List<Integer> result = dummyDao.selectOne(tableName, sqlOptions);
+
+        logger.info("result: " + result);
+    }
+
+}
+

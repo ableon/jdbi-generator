@@ -4,10 +4,8 @@ import java.sql.SQLException;
 import java.util.*;
 
 
-public abstract class AbstractCrudDao<Entity, Key, GeneratedKey> extends AbstractLogging implements CrudDao<Entity, Key>
+public abstract class AbstractCrudDao<Entity, Key, GeneratedKey> extends AbstractDao implements CrudDao<Entity, Key>
 {
-    protected final Map<String, Object> EMPTY_MAP = new HashMap<>();
-
 
     protected AbstractCrudDao()
     {
@@ -45,18 +43,6 @@ public abstract class AbstractCrudDao<Entity, Key, GeneratedKey> extends Abstrac
     }
 
 
-    protected boolean isEmpty(Map<?, ?> map)
-    {
-        return (map == null || map.isEmpty());
-    }
-
-
-    protected boolean isEmpty(Collection<?> collection)
-    {
-        return (collection == null || collection.isEmpty());
-    }
-
-
     protected boolean isValidIdentifier(String str, StringBuilder validIdentifier)
     {
         boolean valid = true;
@@ -85,23 +71,6 @@ public abstract class AbstractCrudDao<Entity, Key, GeneratedKey> extends Abstrac
         }
 
         return valid;
-    }
-
-
-    protected Map<String, Object> getOptions(SqlOptions sqlOptions)
-    {
-        return (sqlOptions != null) ? sqlOptions.toMap() : EMPTY_MAP;
-    }
-
-    protected Map<String, Object> getOptions(SqlOptions sqlOptions, int limitByDefault)
-    {
-        if (sqlOptions == null)
-            sqlOptions = SqlOptions.builder().build();
-
-        if (sqlOptions.getLimit() == null)
-            sqlOptions.setLimit( limitByDefault );
-
-        return getOptions( sqlOptions );
     }
 
 

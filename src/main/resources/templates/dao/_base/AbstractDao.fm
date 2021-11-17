@@ -4,14 +4,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Array;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 
-public abstract class AbstractLogging
+public abstract class AbstractDao
 {
     protected Logger logger = LoggerFactory.getLogger( getClass() );
 
+    protected final Map<String, Object> EMPTY_MAP = new HashMap<>();
 
-    protected AbstractLogging() {}
+
+    protected AbstractDao() {}
 
 
     public Logger getLogger() { return logger; }
@@ -57,6 +62,35 @@ public abstract class AbstractLogging
     {
         if (logger.isDebugEnabled())
             logger.debug("{}: {}", msg, value);
+    }
+
+
+    protected boolean isEmpty(Map<?, ?> map)
+    {
+        return (map == null || map.isEmpty());
+    }
+
+
+    protected boolean isEmpty(Collection<?> collection)
+    {
+        return (collection == null || collection.isEmpty());
+    }
+
+
+    protected Map<String, Object> getOptions(SqlOptions sqlOptions)
+    {
+        return (sqlOptions != null) ? sqlOptions.toMap() : EMPTY_MAP;
+    }
+
+    protected Map<String, Object> getOptions(SqlOptions sqlOptions, int limitByDefault)
+    {
+        if (sqlOptions == null)
+            sqlOptions = SqlOptions.builder().build();
+
+        if (sqlOptions.getLimit() == null)
+            sqlOptions.setLimit( limitByDefault );
+
+        return getOptions( sqlOptions );
     }
 
 }

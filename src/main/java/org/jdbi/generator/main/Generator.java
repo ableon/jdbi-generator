@@ -124,6 +124,9 @@ public class Generator extends AbstractComponent
 
             TestCrudDaoTemplate testCrudDaoTemplate = new TestCrudDaoTemplate(workspace, explorer.getTables());
             testCrudDaoTemplate.generate();
+
+            TestCustomDaoTemplate testCustomDaoTemplate = new TestCustomDaoTemplate(workspace, explorer.getTables());
+            testCustomDaoTemplate.generate();
         }
 
         Console.verbose("");
