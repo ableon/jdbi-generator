@@ -255,6 +255,10 @@ public abstract class AbstractTemplate extends AbstractComponent
     {
         String source = getSource(index,dbTable);
         String target = getTarget(index,dbTable);
+
+        if (target == null)
+            return;
+
         StringBuilder template = Files.readStream( Resources.getResourceAsStream(source) );
 
         preMapping( template );

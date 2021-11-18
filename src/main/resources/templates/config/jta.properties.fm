@@ -1,24 +1,9 @@
 
+# https://www.atomikos.com/Documentation/JtaProperties#Transaction_manager
 
-spring.jta.enabled = true
-<#if atomikosProperties??>
-<#list atomikosProperties as key, value>
-spring.jta.atomikos.properties.${key} = ${value}
-</#list>
-</#if>
-
-spring.jta.atomikos.datasource.${DataSourcePropertiesName}.uniqueResourceName = DS-${ClassName}
-spring.jta.atomikos.datasource.${DataSourcePropertiesName}.minPoolSize = 1
-spring.jta.atomikos.datasource.${DataSourcePropertiesName}.maxPoolSize = 4
-spring.jta.atomikos.datasource.${DataSourcePropertiesName}.maxLifeTime = 20000
-spring.jta.atomikos.datasource.${DataSourcePropertiesName}.borrowConnectionTimeout = 10000
-spring.jta.atomikos.datasource.${DataSourcePropertiesName}.xaDataSourceClassName = ${datasourceClassName}
-spring.jta.atomikos.datasource.${DataSourcePropertiesName}.xaProperties.url = ${jdbcUrl}
-spring.jta.atomikos.datasource.${DataSourcePropertiesName}.xaProperties.user = ${username}
-spring.jta.atomikos.datasource.${DataSourcePropertiesName}.xaProperties.password = ${password}
-<#if properties??>
-<#list properties as key, value>
-spring.jta.atomikos.datasource.${DataSourcePropertiesName}.xaProperties.${key} = ${value}
+<#if jtaProperties??>
+<#list jtaProperties as key, value>
+com.atomikos.icatch.${key} = ${value}
 </#list>
 </#if>
 

@@ -12,8 +12,8 @@ spring.hikari.datasource.${DataSourcePropertiesName}.minimumIdle = 1
 spring.hikari.datasource.${DataSourcePropertiesName}.maximumPoolSize = 4
 spring.hikari.datasource.${DataSourcePropertiesName}.idleTimeout = 600000
 spring.hikari.datasource.${DataSourcePropertiesName}.maxLifetime = 1800000
-<#if properties??>
-<#list properties as key, value>
+<#if dataSourceProperties??>
+<#list dataSourceProperties as key, value>
 spring.hikari.datasource.${DataSourcePropertiesName}.dataSourceProperties.${key} = ${value}
 </#list>
 </#if>

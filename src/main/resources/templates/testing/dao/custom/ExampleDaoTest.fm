@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 <#if spring>
-@Transactional<#if !jta>(transactionManager = ${DataSourceClassName}DataSourceConfig.TRANSACTION_MANAGER)</#if>
+@Transactional(transactionManager = ${DataSourceClassName}DataSourceConfig.TRANSACTION_MANAGER)
 @Rollback(true)
 </#if>
 public class ExampleDaoTest extends AbstractDaoTest

@@ -5,15 +5,28 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import javax.sql.DataSource;
-<#if !jta>
+<#if jta>
+import com.atomikos.icatch.jta.UserTransactionManager;
+import com.atomikos.jdbc.AtomikosDataSourceBean;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.jta.JtaTransactionManager;
+<#else>
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-<#else>
-import com.atomikos.jdbc.AtomikosDataSourceBean;
 </#if>
 
+<#if jta>
+/*
+    <!-- Atomikos -->
+    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jta-atomikos -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-jta-atomikos</artifactId>
+    </dependency>
+*/
+</#if>
 
 @Configuration
 @PropertySource(value = "classpath:/${datasources}/${type}.${DataSourcePropertiesName}.properties")
@@ -21,23 +34,51 @@ public class ${ClassName}DataSourceConfig
 {
     public static final String NAME = "${ClassName}";
     public static final String DATASOURCE = NAME + "DataSource";
-    <#if !jta>
     public static final String TRANSACTION_MANAGER = NAME + "TransactionManager";
 
+    <#if jta>
 
-
-    @Bean(DATASOURCE)
+    @Bean(name=DATASOURCE, initMethod = "init", destroyMethod = "close")
+    @ConfigurationProperties(prefix = "spring.jta.atomikos.datasource.${DataSourcePropertiesName}")
     public DataSource dataSource()
     {
-        return new HikariDataSource( ${objectName}HikariConfig() );
+        return new AtomikosDataSourceBean();
     }
 
+
+    @Bean(initMethod = "init", destroyMethod = "close")
+    public UserTransactionManager userTransactionManager()
+    {
+        UserTransactionManager userTransactionManager = new UserTransactionManager();
+        userTransactionManager.setStartupTransactionService(true);
+        userTransactionManager.setForceShutdown(true);
+        return userTransactionManager;
+    }
+
+
+    @Bean(TRANSACTION_MANAGER)
+    public PlatformTransactionManager transactionManager()
+    {
+        JtaTransactionManager jtaTransactionManager = new JtaTransactionManager();
+        jtaTransactionManager.setTransactionManager(userTransactionManager());
+        jtaTransactionManager.setUserTransaction(userTransactionManager());
+        return jtaTransactionManager;
+    }
+
+    <#else>
 
     @Bean
     @ConfigurationProperties(prefix = "spring.hikari.datasource.${DataSourcePropertiesName}")
     protected HikariConfig ${objectName}HikariConfig()
     {
         return new HikariConfig();
+    }
+
+
+    @Bean(DATASOURCE)
+    public DataSource dataSource()
+    {
+        return new HikariDataSource( ${objectName}HikariConfig() );
     }
 
 
@@ -48,16 +89,7 @@ public class ${ClassName}DataSourceConfig
         transactionManager.setDataSource( dataSource() );
         return transactionManager;
     }
-    <#else>
 
-
-    @Bean(DATASOURCE)
-    @ConfigurationProperties(prefix = "spring.jta.atomikos.datasource.${DataSourcePropertiesName}")
-    public DataSource dataSource()
-    {
-        return new AtomikosDataSourceBean();
-    }
     </#if>
-
 }
 

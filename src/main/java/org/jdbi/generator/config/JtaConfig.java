@@ -21,9 +21,8 @@ public class JtaConfig extends AbstractComponent
     @JsonAlias("datasourceClassName")
     protected String datasourceClassName;
 
-    @JsonProperty("atomikos-properties")
-    @JsonAlias("atomikosProperties")
-    protected Map<String, String> atomikosProperties;
+    @JsonProperty("properties")
+    protected Map<String, String> properties;
 
 
     public JtaConfig() {}
@@ -49,14 +48,14 @@ public class JtaConfig extends AbstractComponent
         this.datasourceClassName = datasourceClassName;
     }
 
-    public Map<String, String> getAtomikosProperties()
+    public Map<String, String> getProperties()
     {
-        return atomikosProperties;
+        return properties;
     }
 
-    public void setAtomikosProperties(Map<String, String> atomikosProperties)
+    public void setProperties(Map<String, String> properties)
     {
-        this.atomikosProperties = atomikosProperties;
+        this.properties = properties;
     }
 
     public Set<ConstraintViolation<Object>> validate()

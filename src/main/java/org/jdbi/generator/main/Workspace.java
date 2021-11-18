@@ -33,7 +33,7 @@ public class Workspace
 
     private Boolean jta;
     private String datasourceClassName;
-    private Map<String, String> atomikosProperties;
+    private Map<String, String> jtaProperties;
 
     private String dataSourceName;
     private Map<String, String> dataSourceProperties;
@@ -61,7 +61,7 @@ public class Workspace
 
         setJta( jtaConfig.getEnabled() );
         setDatasourceClassName( jtaConfig.getDatasourceClassName() );
-        setAtomikosProperties( jtaConfig.getAtomikosProperties() );
+        setJtaProperties( jtaConfig.getProperties() );
         setDataSourceName( dataSourceConfig.getName() );
         setDataSourceProperties( dataSourceConfig.getProperties() );
         setProjectType( projectConfig.getType() );
@@ -95,14 +95,14 @@ public class Workspace
         this.datasourceClassName = datasourceClassName;
     }
 
-    public Map<String, String> getAtomikosProperties()
+    public Map<String, String> getJtaProperties()
     {
-        return atomikosProperties;
+        return jtaProperties;
     }
 
-    public void setAtomikosProperties(Map<String, String> atomikosProperties)
+    public void setJtaProperties(Map<String, String> jtaProperties)
     {
-        this.atomikosProperties = atomikosProperties;
+        this.jtaProperties = jtaProperties;
     }
 
     public String getDataSourceName()

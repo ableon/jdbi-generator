@@ -1,0 +1,19 @@
+
+
+spring.jta.enabled = true
+spring.jta.atomikos.datasource.${DataSourcePropertiesName}.uniqueResourceName = DS-${ClassName}
+spring.jta.atomikos.datasource.${DataSourcePropertiesName}.poolSize = 4
+spring.jta.atomikos.datasource.${DataSourcePropertiesName}.minPoolSize = 1
+spring.jta.atomikos.datasource.${DataSourcePropertiesName}.maxPoolSize = 4
+spring.jta.atomikos.datasource.${DataSourcePropertiesName}.maxLifeTime = 20000
+spring.jta.atomikos.datasource.${DataSourcePropertiesName}.borrowConnectionTimeout = 10000
+spring.jta.atomikos.datasource.${DataSourcePropertiesName}.xaDataSourceClassName = ${datasourceClassName}
+spring.jta.atomikos.datasource.${DataSourcePropertiesName}.xaProperties.url = ${jdbcUrl}
+spring.jta.atomikos.datasource.${DataSourcePropertiesName}.xaProperties.user = ${username}
+spring.jta.atomikos.datasource.${DataSourcePropertiesName}.xaProperties.password = ${password}
+<#if dataSourceProperties??>
+<#list dataSourceProperties as key, value>
+spring.jta.atomikos.datasource.${DataSourcePropertiesName}.xaProperties.${key} = ${value}
+</#list>
+</#if>
+

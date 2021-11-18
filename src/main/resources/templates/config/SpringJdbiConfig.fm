@@ -127,7 +127,7 @@ public class ${ClassName}JdbiConfig
         // sql logger
         jdbi.setSqlLogger(new SqlLogger()
         {
-            private final Logger logger = LoggerFactory.getLogger(Jdbi.class);
+            private final Logger logger = LoggerFactory.getLogger( jdbi.getClass() );
 
             @Override
             public void logBeforeExecution(StatementContext context)

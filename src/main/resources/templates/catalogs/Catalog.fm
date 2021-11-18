@@ -20,6 +20,8 @@ public enum ${ClassName}
 
     public static final class Code
     {
+        private Code() {}
+
         <#list catalogData as catalogCode, catalogValue>
         public static final String ${catalogCode} = "${catalogCode}";
         </#list>

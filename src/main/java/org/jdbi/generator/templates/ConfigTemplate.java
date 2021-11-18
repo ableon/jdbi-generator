@@ -16,6 +16,7 @@ public class ConfigTemplate extends AbstractTemplate
         "templates/config/${ProjectType}DataSourceConfig.fm",
         "templates/config/${ProjectType}JdbiConfig.fm",
         "templates/config/${type}.properties.fm",
+        "templates/config/jta.properties.fm",
     };
 
     private static final String[] TARGET =
@@ -23,6 +24,7 @@ public class ConfigTemplate extends AbstractTemplate
         "${ClassName}DataSourceConfig.java",
         "${ClassName}JdbiConfig.java",
         "${type}.${DataSourcePropertiesName}.properties",
+        "jta.properties",
     };
 
 
@@ -34,7 +36,7 @@ public class ConfigTemplate extends AbstractTemplate
 
     private String getType()
     {
-        return bool(getWorkspace().getJta()) ? "jta" : "datasource";
+        return bool(getWorkspace().getJta()) ? "jta.datasource" : "datasource";
     }
 
 
@@ -60,6 +62,14 @@ public class ConfigTemplate extends AbstractTemplate
     {
         String target;
 
+        if (TARGET[index].equals("jta.properties"))
+        {
+            if (!bool(getWorkspace().getJta()))
+                return null;
+
+            return getWorkspace().getResourcesDir() + TARGET[index];
+        }
+        else
         if (TARGET[index].endsWith(".properties"))
         {
             target = getWorkspace().getDataSourcesResourcesDir() +
@@ -104,10 +114,10 @@ public class ConfigTemplate extends AbstractTemplate
         map.put("jdbcUrl", getWorkspace().getDbConnection().getJdbcUrl());
         map.put("username", getWorkspace().getDbConnection().getUsername());
         map.put("password", getWorkspace().getDbConnection().getPassword());
-        map.put("properties", getWorkspace().getDataSourceProperties());
+        map.put("dataSourceProperties", getWorkspace().getDataSourceProperties());
         map.put("jta", bool(getWorkspace().getJta()));
         map.put("datasourceClassName", getWorkspace().getDatasourceClassName());
-        map.put("atomikosProperties", getWorkspace().getAtomikosProperties());
+        map.put("jtaProperties", getWorkspace().getJtaProperties());
 
         return map;
     }

@@ -23,8 +23,8 @@ public class Main
                 {
                     //"-h",
                     "-f",
-                    "C:/Temp/jdbi-generator/manadas-access.yml",
-                    //"C:/Temp/jdbi-generator/manadas-mysql.yml",
+                    //"C:/Temp/jdbi-generator/manadas-access.yml",
+                    "C:/Temp/jdbi-generator/manadas-mysql.yml",
                     //"./test-postgresql.yml",
                     "-v",
                 };
