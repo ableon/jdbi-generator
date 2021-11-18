@@ -1,11 +1,11 @@
 package org.jdbi.generator.explorer;
 
 import jakarta.validation.ValidationException;
-import org.jdbi.generator.main.AbstractComponent;
 import org.jdbi.generator.cli.Console;
 import org.jdbi.generator.config.Config;
 import org.jdbi.generator.config.DataSourceConfig;
 import org.jdbi.generator.config.GeneratorConfig;
+import org.jdbi.generator.main.AbstractComponent;
 import org.jdbi.generator.mapper.Mapper;
 import org.jdbi.generator.templates.SqlTemplate;
 import org.jdbi.generator.utils.Resources;

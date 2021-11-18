@@ -45,7 +45,6 @@ public class TestCustomDaoTemplate extends AbstractTemplate
     @Override
     protected void preMapping(StringBuilder template)
     {
-
     }
 
 

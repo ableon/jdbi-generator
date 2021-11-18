@@ -1,8 +1,8 @@
 package org.jdbi.generator.templates;
 
-import org.jdbi.generator.main.Workspace;
 import org.jdbi.generator.explorer.DBColumn;
 import org.jdbi.generator.explorer.DBTable;
+import org.jdbi.generator.main.Workspace;
 import org.jdbi.generator.utils.Strings;
 
 import java.util.ArrayList;

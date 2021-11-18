@@ -1,10 +1,10 @@
 package org.jdbi.generator.templates;
 
-import org.jdbi.generator.main.AbstractComponent;
-import org.jdbi.generator.main.Workspace;
 import org.jdbi.generator.explorer.DBColumn;
 import org.jdbi.generator.explorer.DBConnection;
 import org.jdbi.generator.explorer.DBTable;
+import org.jdbi.generator.main.AbstractComponent;
+import org.jdbi.generator.main.Workspace;
 import org.jdbi.generator.utils.Files;
 import org.jdbi.generator.utils.Resources;
 import org.jdbi.generator.utils.Strings;
@@ -253,10 +253,14 @@ public abstract class AbstractTemplate extends AbstractComponent
 
     protected void generate(int index, DBTable dbTable) throws Exception
     {
-        String source = getSource(index,dbTable);
-        String target = getTarget(index,dbTable);
+        String source = getSource(index, dbTable);
 
-        if (target == null)
+        if (isNullOrEmpty(source))
+            return;
+
+        String target = getTarget(index, dbTable);
+
+        if (isNullOrEmpty(target))
             return;
 
         StringBuilder template = Files.readStream( Resources.getResourceAsStream(source) );

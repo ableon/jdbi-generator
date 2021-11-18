@@ -55,12 +55,10 @@ public class FreemarkerTemplates
     }
 
 
-    public void process(String templateName, StringBuilder buffer, Map<String, Object> mapping) throws Exception
+    public void process(String templateName, StringBuilder template, Map<String, Object> mapping) throws Exception
     {
-        //String template = "template";
-
-        String templateContent = buffer.toString();
-        buffer.delete(0, buffer.length());
+        String templateContent = template.toString();
+        template.delete(0, template.length());
 
         StringTemplateLoader stringLoader = new StringTemplateLoader();
         stringLoader.putTemplate(templateName, templateContent);
@@ -78,7 +76,7 @@ public class FreemarkerTemplates
 
         templateConf.process(mapping, writer);
 
-        buffer.append( writer.toString() );
+        template.append( writer );
     }
 
 }
