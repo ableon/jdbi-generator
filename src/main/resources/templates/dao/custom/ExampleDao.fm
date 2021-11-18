@@ -1,0 +1,14 @@
+package ${CustomDaoPackage};
+
+import ${BaseDaoPackage}.SqlOptions;
+
+import java.sql.SQLException;
+import java.util.List;
+
+
+public interface ExampleDao
+{
+
+    List<Integer> selectOne(String tableName, SqlOptions sqlOptions) throws SQLException;
+
+}

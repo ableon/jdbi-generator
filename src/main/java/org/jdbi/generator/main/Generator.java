@@ -112,6 +112,10 @@ public class Generator extends AbstractComponent
             Console.verbose("Generating Crud Dao...");
             CrudDaoTemplate crudDaoTemplate = new CrudDaoTemplate(workspace, explorer.getTables());
             crudDaoTemplate.generate();
+
+            // custom (example)
+            CustomDaoTemplate customDaoTemplate = new CustomDaoTemplate(workspace, explorer.getTables());
+            customDaoTemplate.generate();
         }
 
         ////Console.verbose("Generating LookUp Dao...");
@@ -125,6 +129,7 @@ public class Generator extends AbstractComponent
             TestCrudDaoTemplate testCrudDaoTemplate = new TestCrudDaoTemplate(workspace, explorer.getTables());
             testCrudDaoTemplate.generate();
 
+            // custom (example)
             TestCustomDaoTemplate testCustomDaoTemplate = new TestCustomDaoTemplate(workspace, explorer.getTables());
             testCustomDaoTemplate.generate();
         }

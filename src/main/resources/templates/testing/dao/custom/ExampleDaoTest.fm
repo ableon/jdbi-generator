@@ -6,7 +6,7 @@ import ${ConfigPackage}.${DataSourceClassName}DataSourceConfig;
 import ${BaseDaoPackage}.SqlOptions;
 import ${EntitiesPackage}.${Entity};
 import ${TestBaseDaoPackage}.AbstractDaoTest;
-import ${CustomDaoPackage}.DummyDao;
+import ${CustomDaoPackage}.ExampleDao;
 import org.junit.jupiter.api.Test;
 <#if spring>
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +20,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional<#if !jta>(transactionManager = ${DataSourceClassName}DataSourceConfig.TRANSACTION_MANAGER)</#if>
 @Rollback(true)
 </#if>
-public class DummyDaoTest extends AbstractDaoTest
+public class ExampleDaoTest extends AbstractDaoTest
 {
     <#if spring>@Autowired @Qualifier(${DataSourceClassName}DataSourceConfig.DATASOURCE)</#if>
     private DataSource dataSource;
 
     <#if spring>@Autowired</#if>
-    private DummyDao dummyDao;
+    private ExampleDao exampleDao;
 
 
-    public DummyDaoTest()
+    public ExampleDaoTest()
     {
         super();
         super.disableConstraints();
@@ -51,7 +51,7 @@ public class DummyDaoTest extends AbstractDaoTest
         String tableName = ${Entity}.TABLE_NAME;
         SqlOptions sqlOptions = SqlOptions.builder().offset(0).limit(5).build();
 
-        List<Integer> result = dummyDao.selectOne(tableName, sqlOptions);
+        List<Integer> result = exampleDao.selectOne(tableName, sqlOptions);
 
         logger.info("result: " + result);
     }

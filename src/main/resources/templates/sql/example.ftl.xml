@@ -1,0 +1,24 @@
+
+
+<statements namespace="Example">
+
+    <includes>
+        <include id="jdbi/@@DataSourceLowerCase@@/crud_macros_dialect.ftl" />
+    </includes>
+
+
+    <statement id="selectOne">
+    <![CDATA[
+
+        <@begin_paginate />
+
+        SELECT 1 FROM ${tableName}
+
+        <@end_paginate />
+
+    ]]>
+    </statement>
+
+
+</statements>
+

@@ -16,15 +16,15 @@ public class CrudDaoTemplate extends AbstractTemplate
     private static final String[] SOURCE =
     {
         "templates/dao/crud/CrudDao.fm",
-        "templates/dao/crud/JdbiCrudDao.fm",
         "templates/dao/crud/CrudDaoImpl.fm",
+        "templates/dao/crud/JdbiCrudDao.fm",
     };
 
     private static final String[] TARGET =
     {
         "${ClassName}CrudDao.java",
-        "${ClassName}JdbiCrudDao.java",
         "${ClassName}CrudDaoImpl.java",
+        "${ClassName}JdbiCrudDao.java",
     };
 
 

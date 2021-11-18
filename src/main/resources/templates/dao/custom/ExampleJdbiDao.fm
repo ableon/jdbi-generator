@@ -1,0 +1,23 @@
+package ${CustomDaoPackage};
+
+import ${BaseDaoPackage}.JdbiCrudDao;
+import ${BaseDaoPackage}.freemarker.UseSqlLocator;
+import org.jdbi.v3.sqlobject.customizer.BindMap;
+import org.jdbi.v3.sqlobject.customizer.Define;
+import org.jdbi.v3.sqlobject.statement.SqlQuery;
+
+import java.util.List;
+import java.util.Map;
+
+
+@UseSqlLocator
+//@RegisterBeanMapper(DummyEntity.class)
+public interface ExampleJdbiDao
+{
+
+    @SqlQuery("Example.selectOne")
+    List<Integer> selectOne(@Define(JdbiCrudDao.TABLE) String tableName,
+                            @Define(JdbiCrudDao.OPTIONS) @BindMap(JdbiCrudDao.OPTIONS) Map<String,Object> options);
+
+}
+

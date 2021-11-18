@@ -30,6 +30,7 @@ public class SqlTemplate extends AbstractTemplate
         "templates/sql/crud.ftl.xml",
         "templates/sql/crud_macros.ftl",
         "templates/sql/crud_macros_dialect_${DataBaseType}.ftl",
+        "templates/sql/example.ftl.xml",
         "templates/sql/lookup.ftl.xml",
     };
 
@@ -38,6 +39,7 @@ public class SqlTemplate extends AbstractTemplate
         "crud.ftl.xml",
         "crud_macros.ftl",
         "crud_macros_dialect.ftl",
+        "example.ftl.xml",
         "lookup.ftl.xml",
     };
 

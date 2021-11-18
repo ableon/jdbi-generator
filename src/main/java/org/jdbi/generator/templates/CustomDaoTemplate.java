@@ -4,25 +4,30 @@ import org.jdbi.generator.explorer.DBTable;
 import org.jdbi.generator.main.Workspace;
 import org.jdbi.generator.utils.Strings;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
-public class TestCustomDaoTemplate extends AbstractTemplate
+public class CustomDaoTemplate extends AbstractTemplate
 {
     private static final String[] SOURCE =
     {
-        "templates/testing/dao/custom/ExampleDaoTest.fm",
+        "templates/dao/custom/ExampleDao.fm",
+        "templates/dao/custom/ExampleDaoImpl.fm",
+        "templates/dao/custom/ExampleJdbiDao.fm",
     };
 
     private static final String[] TARGET =
     {
-        "ExampleDaoTest.java",
+        "ExampleDao.java",
+        "ExampleDaoImpl.java",
+        "ExampleJdbiDao.java",
     };
 
 
-    public TestCustomDaoTemplate(Workspace workspace, List<DBTable> tables)
+    public CustomDaoTemplate(Workspace workspace, List<DBTable> tables)
     {
         super(workspace, tables);
     }
@@ -38,14 +43,13 @@ public class TestCustomDaoTemplate extends AbstractTemplate
     @Override
     public String getTarget(int index, DBTable dbTable)
     {
-        return getWorkspace().getTestCustomDaoDir() + TARGET[index];
+        return getWorkspace().getCustomDaoDir() + TARGET[index];
     }
 
 
     @Override
     protected void preMapping(StringBuilder template)
     {
-
     }
 
 
@@ -54,16 +58,23 @@ public class TestCustomDaoTemplate extends AbstractTemplate
     {
         Map<String, Object> map = new HashMap<>();
 
-        map.put("TestCustomDaoPackage", getWorkspace().getTestCustomDaoPackage());
-        map.put("TestBaseDaoPackage", getWorkspace().getTestBaseDaoPackage());
-        map.put("BaseDaoPackage", getWorkspace().getBaseDaoPackage());
+        List<String> importList = new ArrayList<>();
+
+        String logAnnotation = "";
+        if (getWorkspace().isLog())
+        {
+            importList.add( getWorkspace().getLogAnnotation() );
+            logAnnotation = "@"+Strings.splitLast(getWorkspace().getLogAnnotation(), ".")[1];
+        }
+
         map.put("CustomDaoPackage", getWorkspace().getCustomDaoPackage());
-        map.put("EntitiesPackage", getWorkspace().getEntitiesPackage());
+        map.put("BaseDaoPackage", getWorkspace().getBaseDaoPackage());
         map.put("ConfigPackage", getWorkspace().getConfigPackage());
         map.put("DataSourceClassName", Strings.toClassName( getWorkspace().getDataSourceName() ));
-        map.put("Entity", Strings.toClassName(getTables().get(0).getName())+"Entity"); // first table
+        map.put("importList", importList);
         map.put("spring", getWorkspace().isSpring());
-        map.put("jta", bool(getWorkspace().getJta()));
+        map.put("log", getWorkspace().isLog());
+        map.put("LogAnnotation", logAnnotation);
 
         return map;
     }

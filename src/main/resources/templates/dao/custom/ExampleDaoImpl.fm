@@ -1,0 +1,56 @@
+package ${CustomDaoPackage};
+
+import java.util.List;
+import java.sql.SQLException;
+import javax.annotation.PostConstruct;
+<#list importList as import>
+import ${import};
+</#list>
+import ${BaseDaoPackage}.AbstractDao;
+import ${BaseDaoPackage}.SqlOptions;
+import ${ConfigPackage}.${DataSourceClassName}DataSourceConfig;
+import ${ConfigPackage}.${DataSourceClassName}JdbiConfig;
+import org.jdbi.v3.core.Jdbi;
+<#if spring>
+import org.springframework.stereotype.Repository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+</#if>
+
+
+<#if log>${LogAnnotation}</#if>
+<#if spring>@Repository(${DataSourceClassName}DataSourceConfig.NAME + ".ExampleDao")</#if>
+public class ExampleDaoImpl extends AbstractDao implements ExampleDao
+{
+    <#if spring>@Autowired @Qualifier(${DataSourceClassName}JdbiConfig.JDBI)</#if>
+    private Jdbi jdbi;
+
+    private ExampleJdbiDao exampleJdbiDao;
+
+
+    public ExampleDaoImpl() {}
+
+
+    @PostConstruct
+    public void init()
+    {
+        exampleJdbiDao = jdbi.onDemand( ExampleJdbiDao.class );
+    }
+
+
+    @Override
+    public List<Integer> selectOne(String tableName, SqlOptions sqlOptions) throws SQLException
+    {
+        try
+        {
+            return exampleJdbiDao.selectOne(tableName, super.getOptions(sqlOptions, 10));
+        }
+        catch (Exception e)
+        {
+            throw new SQLException(e);
+        }
+    }
+
+}
+
+
