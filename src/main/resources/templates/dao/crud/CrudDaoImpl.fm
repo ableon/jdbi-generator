@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 </#if>
 
-
 <#if log>${LogAnnotation}</#if>
 <#if spring>@Repository(${DataSourceClassName}DataSourceConfig.NAME + ".${ClassName}CrudDao")</#if>
 public class ${ClassName}CrudDaoImpl extends AbstractCrudDao<${Entity}, ${Key}, ${GeneratedKey}> implements ${ClassName}CrudDao

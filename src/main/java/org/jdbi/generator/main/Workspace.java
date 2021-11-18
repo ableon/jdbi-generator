@@ -23,10 +23,9 @@ public class Workspace
     public static final String DATA_SOURCES = "datasources";
     public static final String BASE         = "_base";
     public static final String CONSTRAINTS  = "constraints";
-    public static final String MODEL        = "model";
-    public static final String DAO          = "dao";
     public static final String ENTITIES     = "entities";
     public static final String CATALOGS     = "catalogs";
+    public static final String DAO          = "dao";
     public static final String CRUD         = "crud";
     public static final String LOOKUP       = "lookup";
     public static final String CUSTOM       = "custom";
@@ -41,8 +40,10 @@ public class Workspace
     private String projectPath;
     private String mainPackage;
     private String configPackage;
+    private String modelPackage;
+    private String daoPackage;
     private String testPackage;
-    private Boolean lombok;
+    private Boolean useLombok;
     private Boolean dtoBuilders;
     private Boolean timestampsLikeDates;
     private String logAnnotation;
@@ -68,8 +69,10 @@ public class Workspace
         setProjectPath( projectConfig.getPath() );
         setMainPackage( projectConfig.getMainPackage() );
         setConfigPackage( projectConfig.getConfigPackage() );
+        setModelPackage( projectConfig.getModelPackage() );
+        setDaoPackage( projectConfig.getDaoPackage() );
         setTestPackage( projectConfig.getTestPackage() );
-        setLombok( projectConfig.getLombok() );
+        setUseLombok( projectConfig.getUseLombok() );
         setDtoBuilders( projectConfig.getDtoBuilders() );
         setTimestampsLikeDates( projectConfig.getTimestampsLikeDates() );
         setLogAnnotation( projectConfig.getLogAnnotation() );
@@ -165,6 +168,26 @@ public class Workspace
         this.configPackage = configPackage;
     }
 
+    public String getModelPackage()
+    {
+        return modelPackage;
+    }
+
+    public void setModelPackage(String modelPackage)
+    {
+        this.modelPackage = modelPackage;
+    }
+
+    public String getDaoPackage()
+    {
+        return daoPackage;
+    }
+
+    public void setDaoPackage(String daoPackage)
+    {
+        this.daoPackage = daoPackage;
+    }
+
     public String getTestPackage()
     {
         return testPackage;
@@ -185,14 +208,14 @@ public class Workspace
         this.dtoBuilders = dtoBuilders;
     }
 
-    public Boolean getLombok()
+    public Boolean getUseLombok()
     {
-        return lombok;
+        return useLombok;
     }
 
-    public void setLombok(Boolean lombok)
+    public void setUseLombok(Boolean useLombok)
     {
-        this.lombok = lombok;
+        this.useLombok = useLombok;
     }
 
     public Boolean getTimestampsLikeDates()
@@ -277,6 +300,16 @@ public class Workspace
         return toJavaPath( configPackage.replace('.', '/') );
     }
 
+    public String getModelPackagePath()
+    {
+        return toJavaPath( modelPackage.replace('.', '/') );
+    }
+
+    public String getDaoPackagePath()
+    {
+        return toJavaPath( daoPackage.replace('.', '/') );
+    }
+
     public String getTestPackagePath()
     {
         return toJavaPath( testPackage.replace('.', '/') );
@@ -329,7 +362,7 @@ public class Workspace
 
     public String getModelDir()
     {
-        return getJavaDir() + getMainPackagePath() + toJavaPath( MODEL ) + toJavaPath( dataSourceName.toLowerCase() );
+        return getJavaDir() + getModelPackagePath() + toJavaPath( dataSourceName.toLowerCase() );
     }
 
     public String getEntitiesDir()
@@ -354,7 +387,7 @@ public class Workspace
 
     public String getDaoDir()
     {
-        return getJavaDir() + getMainPackagePath() + toJavaPath( DAO );
+        return getJavaDir() + getDaoPackagePath();
     }
 
     public String getDataSourceDaoDir()
@@ -564,8 +597,12 @@ public class Workspace
     public void create()
     {
         // root
+        createDir( getMainDir() );
         createDir( getJavaDir() );
         createDir( getResourcesDir() );
+
+        // test
+        createDir( getTestDir() );
         createDir( getTestJavaDir() );
         createDir( getTestResourcesDir() );
 
@@ -573,11 +610,13 @@ public class Workspace
         createDir( getConfigDir() );
 
         // model
+        createDir( getModelDir() );
         createDir( getEntitiesDir() );
         createDir( getLookUpDir() );
         createDir( getCatalogsDir() );
 
         // dao
+        createDir( getDaoDir() );
         createDir( getBaseDaoDir() );
         createDir( getEncoderDaoDir() );
         createDir( getFreemarkerDaoDir() );
@@ -588,6 +627,7 @@ public class Workspace
         createDir( getCustomDaoDir() );
 
         // test
+        createDir( getTestDaoDir() );
         createDir( getTestBaseDaoDir() );
         createDir( getTestConstraintsDaoDir() );
         createDir( getTestCrudDaoDir() );
@@ -595,6 +635,7 @@ public class Workspace
         createDir( getTestCustomDaoDir() );
 
         // resources
+        createDir( getResourcesDir() );
         createDir( getDataSourcesResourcesDir() );
         createDir( getDataSourceSqlResourcesDir() );
     }

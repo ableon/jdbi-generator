@@ -33,7 +33,7 @@ public class EntityTemplate extends AbstractTemplate
     @Override
     public String getSource(int index, DBTable dbTable)
     {
-        if (bool(getWorkspace().getLombok()))
+        if (bool(getWorkspace().getUseLombok()))
             return SOURCE[index];
         else
             return SOURCE[index].replace("Lombok", "");

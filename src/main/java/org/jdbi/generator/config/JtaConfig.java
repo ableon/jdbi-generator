@@ -21,7 +21,8 @@ public class JtaConfig extends AbstractComponent
     @JsonAlias("datasourceClassName")
     protected String datasourceClassName;
 
-    @JsonProperty("properties")
+    @JsonProperty("atomikos-properties")
+    @JsonAlias("atomikosProperties")
     protected Map<String, String> properties;
 
 

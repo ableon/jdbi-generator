@@ -20,6 +20,11 @@ public class ProjectConfig extends AbstractComponent
     @StringValues("spring")
     protected String type;
 
+    @JsonProperty("path")
+    @NotBlank
+    @CheckPath
+    protected String path;
+
     @JsonProperty("main-package")
     @JsonAlias("mainPackage")
     @NotBlank
@@ -30,19 +35,25 @@ public class ProjectConfig extends AbstractComponent
     @NotBlank
     protected String configPackage;
 
+    @JsonProperty("model-package")
+    @JsonAlias("modelPackage")
+    @NotBlank
+    protected String modelPackage;
+
+    @JsonProperty("dao-package")
+    @JsonAlias("daoPackage")
+    @NotBlank
+    protected String daoPackage;
+
     @JsonProperty("test-package")
     @JsonAlias("testPackage")
     @NotBlank
     protected String testPackage;
 
-    @JsonProperty("path")
-    @NotBlank
-    @CheckPath
-    protected String path;
-
-    @JsonAlias("lombok")
+    @JsonProperty("use-lombok")
+    @JsonAlias("useLombok")
     @NotNull
-    protected Boolean lombok;
+    protected Boolean useLombok;
 
     @JsonProperty("dto-builders")
     @JsonAlias("dtoBuilders")
@@ -53,6 +64,13 @@ public class ProjectConfig extends AbstractComponent
     @JsonAlias("timestampsLikeDates")
     @NotNull
     protected Boolean timestampsLikeDates;
+
+    /* TODO: ??
+    @JsonProperty("log-aspect")
+    @JsonAlias("logAspect")
+    @NotNull
+    protected Boolean logAspect;
+    */
 
     @JsonProperty("log-annotation")
     @JsonAlias("logAnnotation")
@@ -83,6 +101,16 @@ public class ProjectConfig extends AbstractComponent
         this.type = type;
     }
 
+    public String getPath()
+    {
+        return path;
+    }
+
+    public void setPath(String path)
+    {
+        this.path = path;
+    }
+
     public String getMainPackage()
     {
         return mainPackage;
@@ -103,6 +131,26 @@ public class ProjectConfig extends AbstractComponent
         this.configPackage = configPackage;
     }
 
+    public String getModelPackage()
+    {
+        return modelPackage;
+    }
+
+    public void setModelPackage(String modelPackage)
+    {
+        this.modelPackage = modelPackage;
+    }
+
+    public String getDaoPackage()
+    {
+        return daoPackage;
+    }
+
+    public void setDaoPackage(String daoPackage)
+    {
+        this.daoPackage = daoPackage;
+    }
+
     public String getTestPackage()
     {
         return testPackage;
@@ -113,24 +161,14 @@ public class ProjectConfig extends AbstractComponent
         this.testPackage = testPackage;
     }
 
-    public String getPath()
+    public Boolean getUseLombok()
     {
-        return path;
+        return useLombok;
     }
 
-    public void setPath(String path)
+    public void setUseLombok(Boolean useLombok)
     {
-        this.path = path;
-    }
-
-    public Boolean getLombok()
-    {
-        return lombok;
-    }
-
-    public void setLombok(Boolean lombok)
-    {
-        this.lombok = lombok;
+        this.useLombok = useLombok;
     }
 
     public Boolean getDtoBuilders()

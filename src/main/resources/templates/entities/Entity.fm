@@ -17,6 +17,7 @@ public class ${Entity}
     public static final String ${fieldData.column}_COLUMN = "${fieldData.name}";
     </#list>
 
+
     public static final List<String> ColumnsName = new ArrayList<>();
     static
     {
