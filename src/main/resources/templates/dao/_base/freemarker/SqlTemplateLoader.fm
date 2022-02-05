@@ -10,7 +10,6 @@ import org.xml.sax.helpers.DefaultHandler;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.*;
-import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,26 +67,9 @@ public class SqlTemplateLoader implements TemplateLoader
     }
 
 
-    protected InputStream getResourceAsStream(String name)
+    protected InputStream getResourceAsStream(String resourceName)
     {
-        return Thread.currentThread().getContextClassLoader().getResourceAsStream(name);
-    }
-
-
-    private boolean isJar(String path) throws IOException
-    {
-        URI uri = null;
-
-        try
-        {
-            uri = Thread.currentThread().getContextClassLoader().getResource(path).toURI();
-        }
-        catch (Exception e) { /* ignore */ }
-
-        if (uri == null)
-            throw new IOException("path '" + path + "' not found");
-
-        return (uri.getScheme().contains("jar"));
+        return Thread.currentThread().getContextClassLoader().getResourceAsStream( resourceName );
     }
 
 
