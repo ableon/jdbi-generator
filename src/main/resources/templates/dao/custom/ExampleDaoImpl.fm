@@ -42,7 +42,7 @@ public class ExampleDaoImpl extends AbstractDao implements ExampleDao
     {
         try
         {
-            return exampleJdbiDao.selectOne(tableName, super.getOptions(sqlOptions, 10));
+            return exampleJdbiDao.selectOne(tableName, super.getOptions(sqlOptions, 1));
         }
         catch (Exception e)
         {

@@ -75,7 +75,8 @@ public abstract class AbstractDaoTest
     }
 
 
-    private void setEnableDataBaseConstraints(Connection connection, List<String> constraintTablesName, boolean enable) throws SQLException
+    private void setEnableDataBaseConstraints(Connection connection, List<String> constraintTablesName, boolean enable)
+                                              throws SQLException
     {
         if (connection == null)
             throw new SQLException("connection is null");
