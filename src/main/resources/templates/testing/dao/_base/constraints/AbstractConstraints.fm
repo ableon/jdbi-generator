@@ -29,9 +29,9 @@ public abstract class AbstractConstraints
     }
 
 
-    protected void validateTableName(String constraintName) throws SQLException
+    protected void validateTableName(String tableName) throws SQLException
     {
-        if (constraintName == null || constraintName.trim().isEmpty())
+        if (tableName == null || tableName.trim().isEmpty())
             throw new SQLException("table name not defined");
     }
 
