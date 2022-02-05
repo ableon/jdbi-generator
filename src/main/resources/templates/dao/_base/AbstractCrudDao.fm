@@ -43,7 +43,7 @@ public abstract class AbstractCrudDao<Entity, Key, GeneratedKey> extends Abstrac
     }
 
 
-    protected boolean isValidIdentifier(String str, StringBuilder validIdentifier)
+    private boolean isValidIdentifier(String str, StringBuilder validIdentifier)
     {
         boolean valid = true;
 
@@ -74,7 +74,7 @@ public abstract class AbstractCrudDao<Entity, Key, GeneratedKey> extends Abstrac
     }
 
 
-    protected List<String> getSelectColumns(SqlOptions sqlOptions)
+    private List<String> getSelectColumns(SqlOptions sqlOptions)
     {
         List<String> selectColumns = new ArrayList<>();
 
@@ -98,7 +98,7 @@ public abstract class AbstractCrudDao<Entity, Key, GeneratedKey> extends Abstrac
     }
 
 
-    protected void removeKeys(Map<String, Object> columnsMap, Map<String, Object> propertiesMap)
+    private void removeKeys(Map<String, Object> columnsMap, Map<String, Object> propertiesMap)
     {
         Collection<String> columns = getKeyColumnsName();
 
@@ -110,7 +110,7 @@ public abstract class AbstractCrudDao<Entity, Key, GeneratedKey> extends Abstrac
     }
 
 
-    protected void removeGeneratedKeysWithNullValues(Map<String, Object> columnsMap, Map<String, Object> propertiesMap)
+    private void removeGeneratedKeysWithNullValues(Map<String, Object> columnsMap, Map<String, Object> propertiesMap)
     {
         Collection<String> columns = getGeneratedKeyColumnNames();
 
@@ -123,14 +123,14 @@ public abstract class AbstractCrudDao<Entity, Key, GeneratedKey> extends Abstrac
     }
 
 
-    protected boolean isInvalidKey(Map<String, Object> keyColumns)
+    private boolean isInvalidKey(Map<String, Object> keyColumns)
     {
         // invalid key -> is empty or any is null
         return (isEmpty(keyColumns) || keyColumns.values().stream().anyMatch(Objects::isNull));
     }
 
 
-    protected boolean isInvalidFilter(Map<String, Object> filterColumns, SqlOptions sqlOptions)
+    private boolean isInvalidFilter(Map<String, Object> filterColumns, SqlOptions sqlOptions)
     {
         // valid filter -> is not empty and any is not null
         boolean validFilter = (!isEmpty(filterColumns) && filterColumns.values().stream().anyMatch(Objects::nonNull));

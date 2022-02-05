@@ -82,6 +82,7 @@ public abstract class AbstractDao
         return (sqlOptions != null) ? sqlOptions.toMap() : EMPTY_MAP;
     }
 
+
     protected Map<String, Object> getOptions(SqlOptions sqlOptions, int limitByDefault)
     {
         if (sqlOptions == null)
