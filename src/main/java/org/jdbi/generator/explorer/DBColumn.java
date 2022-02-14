@@ -1,7 +1,7 @@
 package org.jdbi.generator.explorer;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 public class DBColumn
 {
