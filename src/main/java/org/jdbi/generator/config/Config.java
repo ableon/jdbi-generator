@@ -46,9 +46,9 @@ public class Config extends AbstractComponent
         this.generatorConfig = generatorConfig;
     }
 
-    public Set<ConstraintViolation<Object>> validate()
+    public Set<ConstraintViolation<?>> validate()
     {
-        Set<ConstraintViolation<Object>> constraintViolations = super.validate( this );
+        Set<ConstraintViolation<?>> constraintViolations = super.validate( this );
 
         if (isNotEmpty(generatorConfig))
             constraintViolations.addAll( generatorConfig.validate() );

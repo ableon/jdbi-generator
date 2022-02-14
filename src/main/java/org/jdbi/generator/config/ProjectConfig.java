@@ -221,9 +221,9 @@ public class ProjectConfig extends AbstractComponent
         this.columnsConfig = columnsConfig;
     }
 
-    public Set<ConstraintViolation<Object>> validate()
+    public Set<ConstraintViolation<?>> validate()
     {
-        Set<ConstraintViolation<Object>> constraintViolations = super.validate( this );
+        Set<ConstraintViolation<?>> constraintViolations = super.validate( this );
 
         if (isNotEmpty(tablesConfig))
             constraintViolations.addAll( tablesConfig.validate() );

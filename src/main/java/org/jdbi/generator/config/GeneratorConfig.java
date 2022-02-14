@@ -165,9 +165,9 @@ public class GeneratorConfig extends AbstractComponent
         this.projectConfig = projectConfig;
     }
 
-    public Set<ConstraintViolation<Object>> validate()
+    public Set<ConstraintViolation<?>> validate()
     {
-        Set<ConstraintViolation<Object>> constraintViolations = super.validate( this );
+        Set<ConstraintViolation<?>> constraintViolations = super.validate( this );
 
         if (isNotEmpty(jtaConfig))
             constraintViolations.addAll( jtaConfig.validate() );

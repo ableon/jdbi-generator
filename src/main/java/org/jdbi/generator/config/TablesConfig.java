@@ -55,9 +55,9 @@ public class TablesConfig extends AbstractComponent
         this.catalogs = catalogs;
     }
 
-    public Set<ConstraintViolation<Object>> validate()
+    public Set<ConstraintViolation<?>> validate()
     {
-        Set<ConstraintViolation<Object>> constraintViolations = super.validate( this );
+        Set<ConstraintViolation<?>> constraintViolations = super.validate( this );
 
         return constraintViolations;
     }

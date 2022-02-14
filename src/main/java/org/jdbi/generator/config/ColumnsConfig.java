@@ -94,9 +94,9 @@ public class ColumnsConfig extends AbstractComponent
         this.invisible = invisible;
     }
 
-    public Set<ConstraintViolation<Object>> validate()
+    public Set<ConstraintViolation<?>> validate()
     {
-        Set<ConstraintViolation<Object>> constraintViolations = super.validate( this );
+        Set<ConstraintViolation<?>> constraintViolations = super.validate( this );
 
         return constraintViolations;
     }

@@ -14,7 +14,7 @@ public abstract class AbstractComponent
     protected AbstractComponent() {}
 
 
-    protected Set<ConstraintViolation<Object>> validate(Object obj)
+    protected Set<ConstraintViolation<?>> validate(Object obj)
     {
         return Validator.getInstance().validate( obj );
     }

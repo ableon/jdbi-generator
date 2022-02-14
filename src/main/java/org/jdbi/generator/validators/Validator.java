@@ -49,7 +49,8 @@ public class Validator extends AbstractComponent
     }
 
 
-    public Set<ConstraintViolation<Object>> validate(Object obj)
+    @Override
+    public Set<ConstraintViolation<?>> validate(Object obj)
     {
         return new LinkedHashSet<>( validator.validate(obj) );
     }
@@ -60,7 +61,7 @@ public class Validator extends AbstractComponent
         if (isNullOrEmpty(config))
             return;
 
-        Set<ConstraintViolation<Object>> constraintViolations = config.validate();
+        Set<ConstraintViolation<?>> constraintViolations = config.validate();
 
         if (isNotEmpty(constraintViolations))
         {
