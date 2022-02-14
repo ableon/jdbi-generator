@@ -20,15 +20,29 @@ public abstract class AbstractComponent
     }
 
 
+    protected String generateUUID()
+    {
+        //return UUID.randomUUID().toString().replace("-","");
+        return UUID.randomUUID().toString();
+    }
+
+
     protected int getProcessorsNumber()
     {
         return Runtime.getRuntime().availableProcessors();
     }
 
 
-    protected void sleep(long time)
+    public static void sleep(long millis)
     {
-        try { Thread.sleep(time); } catch (Throwable th) { /**/ }
+        try
+        {
+            Thread.sleep(millis);
+        }
+        catch (InterruptedException th)
+        {
+            Thread.currentThread().interrupt();
+        }
     }
 
 
@@ -48,48 +62,49 @@ public abstract class AbstractComponent
     }
 
 
-    protected boolean isNotEmpty(Object value)
-    {
-        return isAllNotEmpty( value );
-    }
-
-
     protected boolean isNullOrEmpty(Object value)
     {
-        return isAnyNullOrEmpty( value );
-    }
-
-
-    protected boolean isAllNotEmpty(Object... objects)
-    {
-        return !isAnyNullOrEmpty( objects );
-    }
-
-
-    protected boolean isAnyNullOrEmpty(Object... objects)
-    {
-        if (objects == null)
+        if (value == null)
             return true;
 
-        for (Object obj : objects)
-        {
-            if (obj == null)
-                return true;
+        if (value.getClass().isArray() && (Array.getLength(value) == 0))
+            return true;
 
-            if (obj.getClass().isArray() && (Array.getLength(obj) == 0))
-                return true;
+        if (value instanceof Collection && ((Collection<?>)value).isEmpty())
+            return true;
 
-            if (obj instanceof Collection && ((Collection<?>)obj).isEmpty())
-                return true;
+        if (value instanceof Map && ((Map<?,?>)value).isEmpty())
+            return true;
 
-            if (obj instanceof Map && ((Map<?,?>)obj).isEmpty())
-                return true;
-
-            if (obj.toString().trim().isEmpty())
-                return true;
-        }
+        if (value instanceof String)
+            return ((String)value).trim().isEmpty();
 
         return false;
+    }
+
+
+    protected boolean isAnyNullOrEmpty(Object... values)
+    {
+        if (values == null)
+            return true;
+
+        for (Object value : values)
+            if (isNullOrEmpty(value))
+                return true;
+
+        return false;
+    }
+
+
+    protected boolean isNotEmpty(Object value)
+    {
+        return !isNullOrEmpty( value );
+    }
+
+
+    protected boolean isAllNotEmpty(Object... values)
+    {
+        return !isAnyNullOrEmpty( values );
     }
 
 
