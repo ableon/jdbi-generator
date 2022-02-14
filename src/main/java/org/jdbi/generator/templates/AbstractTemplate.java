@@ -245,7 +245,7 @@ public abstract class AbstractTemplate extends AbstractComponent
             comment += " (encrypted)";
 
         if (isNotEmpty(dbColumn.getForeignKey()))
-            comment += " (fk -> " + dbColumn.getForeignKey() + ")";
+            comment += " (fk -> " + dbColumn.getForeignTable() + "."  + dbColumn.getForeignKey() + ")";
 
         return comment;
     }

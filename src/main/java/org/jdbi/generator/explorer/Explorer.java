@@ -192,6 +192,9 @@ public class Explorer extends AbstractComponent implements AbstractResultSet
                 // foreign keys
                 exploreForeignKeys(dbTable, dbMetaData);
 
+                // external foreign keys
+                exploreExternalForeignKeys(dbTable, dbMetaData);
+
                 // lookupsData and catalogsData
                 if (!catalogs.isEmpty())
                 {
@@ -405,7 +408,33 @@ public class Explorer extends AbstractComponent implements AbstractResultSet
                 String fkColumnName = getString(rst, "FKCOLUMN_NAME");
                 Integer keySeq      = getInt(rst, "KEY_SEQ");
 
-                dbTable.setForeignKey(fkColumnName, pkTableName, pkColumnName);
+                dbTable.addForeignKey(fkColumnName, pkTableName, pkColumnName);
+            }
+        }
+        finally
+        {
+            close(null, null, rst);
+        }
+    }
+
+
+    private void exploreExternalForeignKeys(DBTable dbTable, DatabaseMetaData dbMetaData) throws Exception
+    {
+        ResultSet rst = null;
+
+        try
+        {
+            rst = dbMetaData.getExportedKeys(dbTable.getCatalog(), dbTable.getSchema(), dbTable.getName());
+
+            while (rst.next())
+            {
+                String pkTableName  = getString(rst, "PKTABLE_NAME");
+                String pkColumnName = getString(rst, "PKCOLUMN_NAME");
+                String fkTableName  = getString(rst, "FKTABLE_NAME");
+                String fkColumnName = getString(rst, "FKCOLUMN_NAME");
+                Integer keySeq      = getInt(rst, "KEY_SEQ");
+
+                dbTable.addExternalForeignKey(pkColumnName, fkTableName, fkColumnName);
             }
         }
         finally

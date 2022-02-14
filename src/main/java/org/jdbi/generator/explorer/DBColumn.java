@@ -21,6 +21,9 @@ public class DBColumn
     private boolean primaryKey;
     private boolean uniqueKey;
     private String foreignKey;
+    private String foreignTable;
+    private String externalForeignKey;
+    private String externalForeignTable;
     private String className;
     private boolean quoted;
 
@@ -185,6 +188,36 @@ public class DBColumn
     public void setForeignKey(String foreignKey)
     {
         this.foreignKey = foreignKey;
+    }
+
+    public String getForeignTable()
+    {
+        return foreignTable;
+    }
+
+    public void setForeignTable(String foreignTable)
+    {
+        this.foreignTable = foreignTable;
+    }
+
+    public String getExternalForeignKey()
+    {
+        return externalForeignKey;
+    }
+
+    public void setExternalForeignKey(String externalForeignKey)
+    {
+        this.externalForeignKey = externalForeignKey;
+    }
+
+    public String getExternalForeignTable()
+    {
+        return externalForeignTable;
+    }
+
+    public void setExternalForeignTable(String externalForeignTable)
+    {
+        this.externalForeignTable = externalForeignTable;
     }
 
     public String getClassName()

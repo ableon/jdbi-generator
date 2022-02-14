@@ -17,6 +17,7 @@ public class DBTable
     private final List<DBColumn> primaryKeyColumnList = new ArrayList<>();
     private final List<DBColumn> uniqueKeyColumnList  = new ArrayList<>();
     private final List<DBColumn> foreignKeyColumnList = new ArrayList<>();
+    private final List<DBColumn> externalForeignKeyColumnList = new ArrayList<>();
     private final Map<String,Object> catalogData = new LinkedHashMap<>();
 
 
@@ -141,16 +142,39 @@ public class DBTable
         return foreignKeyColumnList;
     }
 
-    public void setForeignKey(String columnName, String fkTableName, String fkColumnName)
+    public void addForeignKey(String columnName, String foreignTableName, String foreignColumnName)
     {
         for (DBColumn dbColumn : columnList)
         {
             if (dbColumn.getName().equals(columnName))
             {
-                dbColumn.setForeignKey(fkTableName + "." + fkColumnName);
+                dbColumn.setForeignKey( foreignColumnName );
+                dbColumn.setForeignTable( foreignTableName );
 
                 if (!foreignKeyColumnList.contains(dbColumn))
                     foreignKeyColumnList.add( dbColumn );
+
+                break;
+            }
+        }
+    }
+
+    public List<DBColumn> getExternalForeignKeyColumnList()
+    {
+        return externalForeignKeyColumnList;
+    }
+
+    public void addExternalForeignKey(String columnName, String externalForeignTableName, String externalForeignColumnName)
+    {
+        for (DBColumn dbColumn : columnList)
+        {
+            if (dbColumn.getName().equals(columnName))
+            {
+                dbColumn.setExternalForeignKey( externalForeignColumnName );
+                dbColumn.setExternalForeignTable( externalForeignTableName );
+
+                if (!externalForeignKeyColumnList.contains(dbColumn))
+                    externalForeignKeyColumnList.add( dbColumn );
 
                 break;
             }
