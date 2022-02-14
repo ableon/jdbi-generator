@@ -24,7 +24,7 @@ public class XOREncoder implements Encoder
     }
 
 
-    private byte[] encrypt(byte[] data, byte[] key)
+    private byte[] XOR(byte[] data, byte[] key)
     {
         if (data == null || data.length == 0 || key == null || key.length == 0)
         {
@@ -49,7 +49,7 @@ public class XOREncoder implements Encoder
     {
         try
         {
-            byte[] xor = encrypt(plain.getBytes(CHARSET), key.getBytes(CHARSET));
+            byte[] xor = XOR(plain.getBytes(CHARSET), key.getBytes(CHARSET));
             return Base64.getUrlEncoder().withoutPadding().encodeToString( xor );
         }
         catch (Exception e)
@@ -65,7 +65,7 @@ public class XOREncoder implements Encoder
         try
         {
             byte[] b64 = Base64.getUrlDecoder().decode(encoded);
-            return new String(encrypt(b64, key.getBytes(CHARSET)), CHARSET);
+            return new String(XOR(b64, key.getBytes(CHARSET)), CHARSET);
         }
         catch (Exception e)
         {

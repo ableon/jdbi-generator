@@ -11,7 +11,7 @@ import java.util.Map;
 
 public abstract class AbstractDao
 {
-    protected Logger logger = LoggerFactory.getLogger( getClass() );
+    protected final Logger logger = LoggerFactory.getLogger( getClass() );
 
     protected final Map<String, Object> EMPTY_MAP = new HashMap<>();
 
@@ -86,7 +86,7 @@ public abstract class AbstractDao
     protected Map<String, Object> getOptions(SqlOptions sqlOptions, int limitByDefault)
     {
         if (sqlOptions == null)
-            sqlOptions = SqlOptions.builder().build();
+            sqlOptions = new SqlOptions();
 
         if (sqlOptions.getLimit() == null)
             sqlOptions.setLimit( limitByDefault );
