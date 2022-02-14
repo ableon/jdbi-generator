@@ -60,12 +60,7 @@ public class Generator extends AbstractComponent
     {
         Console.separator();
 
-        Workspace workspace = new Workspace(generatorConfig.getJtaConfig(),
-                                            generatorConfig.getDataSourceConfig(),
-                                            generatorConfig.getProjectConfig());
-
-        workspace.setDbConnection( explorer.getDbConnection() );
-
+        Workspace workspace = new Workspace(generatorConfig, explorer.getDbConnection());
         workspace.create();
 
         if (super.bool(generatorConfig.getGenerateConfig()))

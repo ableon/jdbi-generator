@@ -1,8 +1,6 @@
 package org.jdbi.generator.main;
 
-import org.jdbi.generator.config.DataSourceConfig;
-import org.jdbi.generator.config.JtaConfig;
-import org.jdbi.generator.config.ProjectConfig;
+import org.jdbi.generator.config.GeneratorConfig;
 import org.jdbi.generator.explorer.DBConnection;
 import org.jdbi.generator.utils.Strings;
 
@@ -17,8 +15,8 @@ public class Workspace
     public static final String JDBI         = "jdbi";
     public static final String SRC          = "src";
     public static final String MAIN         = "main";
-    public static final String TEST         = "test";
     public static final String JAVA         = "java";
+    public static final String TEST         = "test";
     public static final String RESOURCES    = "resources";
     public static final String DATA_SOURCES = "datasources";
     public static final String BASE         = "_base";
@@ -47,6 +45,7 @@ public class Workspace
     private Boolean dtoBuilders;
     private Boolean timestampsLikeDates;
     private String logAnnotation;
+
     private DBConnection dbConnection;
 
 
@@ -56,27 +55,41 @@ public class Workspace
     }
 
 
-    public Workspace(JtaConfig jtaConfig, DataSourceConfig dataSourceConfig, ProjectConfig projectConfig)
+    public Workspace(GeneratorConfig generatorConfig)
     {
         super();
 
-        setJta( jtaConfig.getEnabled() );
-        setDatasourceClassName( jtaConfig.getDatasourceClassName() );
-        setJtaProperties( jtaConfig.getProperties() );
-        setDataSourceName( dataSourceConfig.getName() );
-        setDataSourceProperties( dataSourceConfig.getProperties() );
-        setProjectType( projectConfig.getType() );
-        setProjectPath( projectConfig.getPath() );
-        setMainPackage( projectConfig.getMainPackage() );
-        setConfigPackage( projectConfig.getConfigPackage() );
-        setModelPackage( projectConfig.getModelPackage() );
-        setDaoPackage( projectConfig.getDaoPackage() );
-        setTestPackage( projectConfig.getTestPackage() );
-        setUseLombok( projectConfig.getUseLombok() );
-        setDtoBuilders( projectConfig.getDtoBuilders() );
-        setTimestampsLikeDates( projectConfig.getTimestampsLikeDates() );
-        setLogAnnotation( projectConfig.getLogAnnotation() );
+        setJta( generatorConfig.getJtaConfig().getEnabled() );
+        setDatasourceClassName( generatorConfig.getJtaConfig().getDatasourceClassName() );
+        setJtaProperties( generatorConfig.getJtaConfig().getProperties() );
+
+        setDataSourceName( generatorConfig.getDataSourceConfig().getName() );
+        setDataSourceProperties( generatorConfig.getDataSourceConfig().getProperties() );
+
+        setProjectType( generatorConfig.getProjectConfig().getType() );
+        setProjectPath( generatorConfig.getProjectConfig().getPath() );
+        setMainPackage( generatorConfig.getProjectConfig().getMainPackage() );
+        setConfigPackage( generatorConfig.getProjectConfig().getConfigPackage() );
+        setModelPackage( generatorConfig.getProjectConfig().getModelPackage() );
+        setDaoPackage( generatorConfig.getProjectConfig().getDaoPackage() );
+        setTestPackage( generatorConfig.getProjectConfig().getTestPackage() );
+        setUseLombok( generatorConfig.getProjectConfig().getUseLombok() );
+        setDtoBuilders( generatorConfig.getProjectConfig().getDtoBuilders() );
+        setTimestampsLikeDates( generatorConfig.getProjectConfig().getTimestampsLikeDates() );
+        setLogAnnotation( generatorConfig.getProjectConfig().getLogAnnotation() );
     }
+
+
+    public Workspace(GeneratorConfig generatorConfig, DBConnection dbConnection)
+    {
+        this( generatorConfig );
+        setDbConnection( dbConnection );
+    }
+
+
+    //
+    // JTA
+    //
 
     public Boolean getJta()
     {
@@ -108,6 +121,11 @@ public class Workspace
         this.jtaProperties = jtaProperties;
     }
 
+
+    //
+    // DataSource
+    //
+
     public String getDataSourceName()
     {
         return dataSourceName;
@@ -127,6 +145,11 @@ public class Workspace
     {
         this.dataSourceProperties = dataSourceProperties;
     }
+
+
+    //
+    // Project
+    //
 
     public String getProjectType()
     {
@@ -264,6 +287,10 @@ public class Workspace
     }
 
 
+    //
+    // Paths
+    //
+
     private void createDir(String dirName)
     {
         if (Strings.isNullOrEmpty(dirName))
@@ -285,34 +312,35 @@ public class Workspace
             return path;
     }
 
+    private String packageToPath(String packageName)
+    {
+        return packageName.replace('.', '/');
+    }
 
-    //
-    // Paths
-    //
 
     public String getMainPackagePath()
     {
-        return toJavaPath( mainPackage.replace('.', '/') );
+        return toJavaPath( packageToPath(mainPackage) );
     }
 
     public String getConfigPackagePath()
     {
-        return toJavaPath( configPackage.replace('.', '/') );
+        return toJavaPath( packageToPath(configPackage) );
     }
 
     public String getModelPackagePath()
     {
-        return toJavaPath( modelPackage.replace('.', '/') );
+        return toJavaPath( packageToPath(modelPackage) );
     }
 
     public String getDaoPackagePath()
     {
-        return toJavaPath( daoPackage.replace('.', '/') );
+        return toJavaPath( packageToPath(daoPackage) );
     }
 
     public String getTestPackagePath()
     {
-        return toJavaPath( testPackage.replace('.', '/') );
+        return toJavaPath( packageToPath(testPackage) );
     }
 
     public String getProjectDir()
@@ -507,6 +535,7 @@ public class Workspace
         return path.substring(index).replace('/', '.');
     }
 
+
     public String getEntitiesPackage()
     {
         return getPackage( getEntitiesDir() );
@@ -591,7 +620,6 @@ public class Workspace
     {
         return getPackage( getTestCustomDaoDir() );
     }
-
 
 
     public void create()
