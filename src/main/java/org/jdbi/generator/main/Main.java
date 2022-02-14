@@ -17,7 +17,7 @@ public class Main
         {
             Console.banner();
 
-            if (true)
+            if (false)
             {
                 args = new String[]
                 {

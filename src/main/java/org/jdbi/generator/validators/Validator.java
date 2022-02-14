@@ -24,7 +24,6 @@ public class Validator extends AbstractComponent
     private Validator()
     {
         // disable logs before creating hibernate-validator instance
-        org.jboss.logging.Logger logger = org.jboss.logging.Logger.getLogger("org.hibernate");
         java.util.logging.Logger.getLogger("org.hibernate").setLevel(java.util.logging.Level.OFF);
 
         Locale.setDefault( Locale.US );
